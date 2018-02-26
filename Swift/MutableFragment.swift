@@ -170,10 +170,10 @@ public final class MutableFragment: Fragment, MutableDictionaryFragment, Mutable
     /// Gets the value as blob or sets the blob value to the fragment object.
     public override var blob: Blob? {
         get {
-            return fragmentImpl.blob
+            return DataConverter.convertGETValue(fragmentImpl.blob) as? Blob
         }
         set {
-            fragmentImpl.blob = newValue
+            fragmentImpl.blob = (DataConverter.convertSETValue(newValue) as! CBLBlob)
         }
     }
     

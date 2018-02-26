@@ -166,16 +166,16 @@ public class ReplicatorConfiguration {
     }
     
     func toImpl() -> CBLReplicatorConfiguration {
-        let t = self.target as! InternalEndpoint
+        let t = self.target as! IEndpoint
         let c = CBLReplicatorConfiguration(database: self.database._impl, target: t.toImpl())
         c.replicatorType = CBLReplicatorType(rawValue:
             UInt32(self.replicatorType.rawValue))
-        if !(self.conflictResolver is DefaultConflictResolver) {
-            c.conflictResolver =
-                BridgingConflictResolver(resolver: self.conflictResolver)
-        }
+        // if !(self.conflictResolver is DefaultConflictResolver) {
+        //    c.conflictResolver =
+        //        BridgingConflictResolver(resolver: self.conflictResolver)
+        //}
         c.continuous = self.continuous
-        c.authenticator = self.authenticator
+        c.authenticator = (self.authenticator as? IAuthenticator)?.toImpl()
         c.pinnedServerCertificate = self.pinnedServerCertificate
         c.headers = self.headers
         c.channels = self.channels
@@ -186,15 +186,3 @@ public class ReplicatorConfiguration {
         return c
     }
 }
-
-
-// MARK: Type aliases
-
-/// The Authenticator.
-public typealias Authenticator = CBLAuthenticator
-
-/// The BasicAuthenticator.
-public typealias BasicAuthenticator = CBLBasicAuthenticator
-
-/// The SessionAuthenticator.
-public typealias SessionAuthenticator = CBLSessionAuthenticator

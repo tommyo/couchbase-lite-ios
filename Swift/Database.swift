@@ -172,9 +172,10 @@ public final class Database {
     @discardableResult  public func addChangeListener(withQueue queue: DispatchQueue?,
         listener: @escaping (DatabaseChange) -> Void) -> ListenerToken
     {
-        return _impl.addChangeListener(with: queue) { (change) in
-            listener(change)
+        let token = _impl.addChangeListener(with: queue) { (change) in
+            listener(DatabaseChange(database: self, documentIDs: change.documentIDs))
         }
+        return ListenerToken(token)
     }
     
     
@@ -191,7 +192,6 @@ public final class Database {
     }
     
     
-    
     /// Adds a document change listener for the document with the given ID and the
     /// dispatch queue on which changes will be posted. If the dispatch queue
     /// is not specified, the changes will be posted on the main queue.
@@ -204,9 +204,10 @@ public final class Database {
     @discardableResult public func addDocumentChangeListener(withID id: String,
         queue: DispatchQueue?, listener: @escaping (DocumentChange) -> Void) -> ListenerToken
     {
-        return _impl.addDocumentChangeListener(withID: id, queue: queue) { (change) in
-            listener(change)
+        let token = _impl.addDocumentChangeListener(withID: id, queue: queue) { (change) in
+            listener(DocumentChange(database: self, documentID: change.documentID))
         }
+        return ListenerToken(token)
     }
     
     
@@ -214,7 +215,7 @@ public final class Database {
     ///
     /// - Parameter token: The listener token.
     public func removeChangeListener(withToken token: ListenerToken) {
-        _impl.removeChangeListener(with: token)
+        _impl.removeChangeListener(with: token._impl)
     }
     
     
@@ -354,13 +355,3 @@ public final class Database {
 
     let _impl: CBLDatabase
 }
-
-/// ListenerToken
-public typealias ListenerToken = CBLListenerToken
-
-/// DatabaseChange
-public typealias DatabaseChange = CBLDatabaseChange
-
-/// DocumentChange
-public typealias DocumentChange = CBLDocumentChange
-

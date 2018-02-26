@@ -106,10 +106,10 @@ public class DatabaseConfiguration {
     func toImpl() -> CBLDatabaseConfiguration {
         let config = CBLDatabaseConfiguration()
         config.directory = self.directory
-        if !(self.conflictResolver is DefaultConflictResolver) {
-            config.conflictResolver =
-                BridgingConflictResolver(resolver: self.conflictResolver)
-        }
+        // if !(self.conflictResolver is DefaultConflictResolver) {
+        //    config.conflictResolver =
+        //        BridgingConflictResolver(resolver: self.conflictResolver)
+        //}
         #if COUCHBASE_ENTERPRISE
         config.encryptionKey = self.encryptionKey?.impl
         #endif

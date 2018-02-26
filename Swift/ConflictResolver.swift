@@ -54,6 +54,7 @@ public protocol ConflictResolver {
     
 }
 
+/*
 class BridgingConflictResolver: NSObject, CBLConflictResolver {
     let _resovler: ConflictResolver
     
@@ -66,6 +67,7 @@ class BridgingConflictResolver: NSObject, CBLConflictResolver {
         return resolved?._impl
     }
 }
+*/
 
 // A placeholder for using default conflict resolver defined in Objective-C
 class DefaultConflictResolver: ConflictResolver {
