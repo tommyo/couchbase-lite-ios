@@ -19,3 +19,8 @@
 
 extern NSString* const kCBLURLEndpointScheme;
 extern NSString* const kCBLURLEndpointTLSScheme;
+
+
+@interface CBLURLEndpoint ()
+- (instancetype) _initWithURL: (NSURL*)url;
+@end

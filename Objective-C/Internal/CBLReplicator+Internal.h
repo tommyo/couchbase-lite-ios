@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, atomic) BOOL active;
 @property (atomic) BOOL suspended;
 @property (nonatomic) MYBackgroundMonitor* bgMonitor;
-
+@property (readonly, atomic) dispatch_queue_t dispatchQueue;
 @end
 
 NS_ASSUME_NONNULL_END

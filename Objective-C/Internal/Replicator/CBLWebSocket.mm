@@ -79,7 +79,7 @@ static constexpr NSTimeInterval kIdleTimeout = 320.0;
     });
 }
 
-static void doOpen(C4Socket* s, const C4Address* addr, C4Slice optionsFleece) {
+static void doOpen(C4Socket* s, const C4Address* addr, C4Slice optionsFleece, void *context) {
     NSURLComponents* c = [NSURLComponents new];
     if (addr->scheme == "blips"_sl || addr->scheme == "wss"_sl)
         c.scheme = @"https";

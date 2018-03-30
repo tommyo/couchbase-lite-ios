@@ -23,6 +23,9 @@
 #import "CBLReplicatorConfiguration.h"
 #import "CBLURLEndpoint.h"
 #import "CBLDatabaseEndpoint.h"
+#ifdef COUCHBASE_ENTERPRISE
+#import "CBLMessageEndpoint+Internal.h"
+#endif
 
 #import "CBLChangeListenerToken.h"
 #import "CBLCoreBridge.h"
@@ -89,6 +92,7 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
 @synthesize status=_status;
 @synthesize bgMonitor=_bgMonitor;
 @synthesize suspended=_suspended;
+@synthesize dispatchQueue=_dispatchQueue;
 
 + (void) initialize {
     if (self == [CBLReplicator class]) {
@@ -170,11 +174,12 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
 
 - (void) _start {
     _desc = self.description;   // cache description; it may be called a lot when logging
-    
+
     // Target:
+    id<CBLEndpoint> endpoint = _config.target;
     C4Address addr;
     CBLDatabase* otherDB;
-    NSURL* remoteURL = $castIf(CBLURLEndpoint, _config.target).url;
+    NSURL* remoteURL = $castIf(CBLURLEndpoint, endpoint).url;
     CBLStringBytes dbName(remoteURL.path.lastPathComponent);
     CBLStringBytes scheme(remoteURL.scheme);
     CBLStringBytes host(remoteURL.host);
@@ -190,8 +195,10 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         };
     } else {
 #ifdef COUCHBASE_ENTERPRISE
-        otherDB = ((CBLDatabaseEndpoint*)_config.target).database;
+        otherDB = $cast(CBLDatabaseEndpoint, endpoint).database;
         Assert(otherDB);
+#else
+        Assert(remoteURL, @"Endpoint has no URL");
 #endif
     }
 
@@ -203,7 +210,7 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         enc << options;
         optionsFleece = enc.finish();
     }
-    
+
     // Create a C4Replicator:
     C4ReplicatorParameters params = {
         .push = mkmode(isPush(_config.replicatorType), _config.continuous),
@@ -215,6 +222,16 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         // TODO: Add .validationFunc (public API TBD)
     };
     
+#ifdef COUCHBASE_ENTERPRISE
+    C4SocketFactory socketFactory = {};
+    auto messageEndpoint = $castIf(CBLMessageEndpoint, endpoint);
+    if (messageEndpoint) {
+        socketFactory = messageEndpoint.socketFactory;
+        socketFactory.context = (__bridge void*)self;
+        params.socketFactory = &socketFactory;
+    }
+#endif
+
     C4Error err;
     CBL_LOCK(_config.database) {
         _repl = c4repl_new(_config.database.c4db, addr, dbName, otherDB.c4db, params, &err);
