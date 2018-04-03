@@ -27,7 +27,7 @@
 #import "CBLMessageEndpoint+Internal.h"
 #endif
 
-#import "CBLChangeListenerToken.h"
+#import "CBLChangeNotifier.h"
 #import "CBLCoreBridge.h"
 #import "CBLDatabase+Internal.h"
 #import "CBLDocument+Internal.h"
@@ -80,7 +80,7 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
     C4ReplicatorStatus _rawStatus;
     unsigned _retryCount;
     CBLReachability* _reachability;
-    NSMutableSet* _listenerTokens;
+    CBLChangeNotifier<CBLReplicatorChange*>* _changeNotifier;
     
     // TODO: Instead of having multiple boolean variables, we could
     // have a enum based variable to represent the replicator state.
@@ -103,6 +103,7 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         NSParameterAssert(config.database != nil && config.target != nil);
         _config = [[CBLReplicatorConfiguration alloc] initWithConfig: config readonly: YES];
         _dispatchQueue = dispatch_get_main_queue();
+        _changeNotifier = [CBLChangeNotifier new];
     }
     return self;
 }
@@ -332,27 +333,12 @@ static BOOL isPull(CBLReplicatorType type) {
 - (id<CBLListenerToken>) addChangeListenerWithQueue: (dispatch_queue_t)queue
                                            listener: (void (^)(CBLReplicatorChange*))listener
 {
-    CBLAssertNotNil(listener);
-    
-    CBL_LOCK(self) {
-        if (!_listenerTokens) {
-            _listenerTokens = [NSMutableSet set];
-        }
-        
-        id token = [[CBLChangeListenerToken alloc] initWithListener: listener
-                                                              queue: queue];
-        [_listenerTokens addObject: token];
-        return token;
-    }
+    return [_changeNotifier addChangeListenerWithQueue: queue listener: listener];
 }
 
 
 - (void) removeChangeListenerWithToken: (id<CBLListenerToken>)token {
-    CBLAssertNotNil(token);
-    
-    CBL_LOCK(self) {
-        [_listenerTokens removeObject: token];
-    }
+    [_changeNotifier removeChangeListenerWithToken: token];
 }
 
 
@@ -384,15 +370,9 @@ static void statusChanged(C4Replicator *repl, C4ReplicatorStatus status, void *c
         [self updateStateProperties: c4Status];
         
         // Post change
-        CBLReplicatorChange* change = [[CBLReplicatorChange alloc] initWithReplicator: self
-                                                                               status: self.status];
-        for (CBLChangeListenerToken* token in _listenerTokens) {
-            void (^listener)(CBLReplicatorChange*) = token.listener;
-            dispatch_async(token.queue, ^{
-                listener(change);
-            });
-        }
-        
+        [_changeNotifier postChange: [[CBLReplicatorChange alloc] initWithReplicator: self
+                                                                              status: self.status]];
+
         // Clear replicator:
         if (c4Status.level == kC4Offline && _isSuspending) {
             _isSuspending = NO;
