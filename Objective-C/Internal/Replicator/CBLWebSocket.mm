@@ -65,19 +65,16 @@ static constexpr NSTimeInterval kIdleTimeout = 320.0;
 }
 
 
-+ (void) registerWithC4 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        c4socket_registerFactory({
-            .providesWebSockets = false,
-            .open = &doOpen,
-            .close = &doClose,
-            .write = &doWrite,
-            .completedReceive = &doCompletedReceive
-        });
-        CBLLog(WebSocket, @"CBLWebSocket registered as C4SocketFactory");
-    });
++ (C4SocketFactory) socketFactory {
+    return {
+        .providesWebSockets = false,
+        .open = &doOpen,
+        .close = &doClose,
+        .write = &doWrite,
+        .completedReceive = &doCompletedReceive
+    };
 }
+
 
 static void doOpen(C4Socket* s, const C4Address* addr, C4Slice optionsFleece, void *context) {
     NSURLComponents* c = [NSURLComponents new];

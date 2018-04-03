@@ -94,13 +94,6 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
 @synthesize suspended=_suspended;
 @synthesize dispatchQueue=_dispatchQueue;
 
-+ (void) initialize {
-    if (self == [CBLReplicator class]) {
-        kCBL_LogDomainSync = c4log_getDomain("Sync", true);
-        [CBLWebSocket registerWithC4];
-    }
-}
-
 
 - (instancetype) initWithConfig: (CBLReplicatorConfiguration *)config {
     CBLAssertNotNil(config);
@@ -211,6 +204,16 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         optionsFleece = enc.finish();
     }
 
+    C4SocketFactory socketFactory;
+#ifdef COUCHBASE_ENTERPRISE
+    auto messageEndpoint = $castIf(CBLMessageEndpoint, endpoint);
+    if (messageEndpoint)
+        socketFactory = messageEndpoint.socketFactory;
+    else
+#endif
+        socketFactory = CBLWebSocket.socketFactory;
+    socketFactory.context = (__bridge void*)self;
+
     // Create a C4Replicator:
     C4ReplicatorParameters params = {
         .push = mkmode(isPush(_config.replicatorType), _config.continuous),
@@ -219,18 +222,8 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         .onStatusChanged = &statusChanged,
         .onDocumentError = &onDocError,
         .callbackContext = (__bridge void*)self,
-        // TODO: Add .validationFunc (public API TBD)
+        .socketFactory = &socketFactory,
     };
-    
-#ifdef COUCHBASE_ENTERPRISE
-    C4SocketFactory socketFactory = {};
-    auto messageEndpoint = $castIf(CBLMessageEndpoint, endpoint);
-    if (messageEndpoint) {
-        socketFactory = messageEndpoint.socketFactory;
-        socketFactory.context = (__bridge void*)self;
-        params.socketFactory = &socketFactory;
-    }
-#endif
 
     C4Error err;
     CBL_LOCK(_config.database) {
