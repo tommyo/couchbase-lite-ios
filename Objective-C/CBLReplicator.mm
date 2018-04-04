@@ -60,13 +60,6 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
 }
 
 
-@interface CBLReplicatorStatus ()
-- (instancetype) initWithActivity: (CBLReplicatorActivityLevel)activity
-                         progress: (CBLReplicatorProgress)progress
-                            error: (NSError*)error;
-@end
-
-
 @interface CBLReplicator ()
 @property (readwrite, nonatomic) CBLReplicatorStatus* status;
 @end
@@ -435,22 +428,12 @@ static void statusChanged(C4Replicator *repl, C4ReplicatorStatus status, void *c
 
 
 - (void) updateStateProperties: (C4ReplicatorStatus)c4Status {
-    NSError *error = nil;
-    if (c4Status.error.code)
-        convertError(c4Status.error, &error);
-    
     _rawStatus = c4Status;
+    self.status = [[CBLReplicatorStatus alloc] initWithStatus: c4Status];
     
-    // Note: c4Status.level is current matched with CBLReplicatorActivityLevel:
-    CBLReplicatorActivityLevel level = (CBLReplicatorActivityLevel)c4Status.level;
-    CBLReplicatorProgress progress = { c4Status.progress.unitsCompleted, c4Status.progress.unitsTotal };
-    self.status = [[CBLReplicatorStatus alloc] initWithActivity: level
-                                                       progress: progress
-                                                          error: error];
-    
-    CBLLog(Sync, @"%@ is %s, progress %llu/%llu, error: %@",
+    CBLLog(Sync, @"%@ is %s, progress %llu/%llu, err: %@",
            self, kC4ReplicatorActivityLevelNames[c4Status.level],
-           c4Status.progress.unitsCompleted, c4Status.progress.unitsTotal, error);
+           c4Status.progress.unitsCompleted, c4Status.progress.unitsTotal, self.status.error);
 }
 
 
@@ -557,15 +540,17 @@ static void onDocError(C4Replicator *repl,
 
 @synthesize activity=_activity, progress=_progress, error=_error;
 
-- (instancetype) initWithActivity: (CBLReplicatorActivityLevel)activity
-                         progress: (CBLReplicatorProgress)progress
-                            error: (NSError*)error
-{
+- (instancetype) initWithStatus: (C4ReplicatorStatus)c4Status {
     self = [super init];
     if (self) {
-        _activity = activity;
-        _progress = progress;
-        _error = error;
+        // Note: c4Status.level is current matched with CBLReplicatorActivityLevel:
+        _activity = (CBLReplicatorActivityLevel)c4Status.level;
+        _progress = { c4Status.progress.unitsCompleted, c4Status.progress.unitsTotal };
+        if (c4Status.error.code) {
+            NSError* error;
+            convertError(c4Status.error, &error);
+            _error = error;
+        }
     }
     return self;
 }

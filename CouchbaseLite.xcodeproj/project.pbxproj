@@ -67,6 +67,10 @@
 		276740B81EE7381E0036DE42 /* CBLTrustCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 276740B51EE7381E0036DE42 /* CBLTrustCheck.h */; };
 		276740B91EE7381E0036DE42 /* CBLTrustCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 276740B61EE7381E0036DE42 /* CBLTrustCheck.m */; };
 		276740BA1EE7381E0036DE42 /* CBLTrustCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 276740B61EE7381E0036DE42 /* CBLTrustCheck.m */; };
+		276B5BF5207442DA00682681 /* CBLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 276B5BF3207442DA00682681 /* CBLSocket.h */; };
+		276B5BF6207442DA00682681 /* CBLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 276B5BF3207442DA00682681 /* CBLSocket.h */; };
+		276B5BF7207442DA00682681 /* CBLSocket.mm in Sources */ = {isa = PBXBuildFile; fileRef = 276B5BF4207442DA00682681 /* CBLSocket.mm */; };
+		276B5BF8207442DA00682681 /* CBLSocket.mm in Sources */ = {isa = PBXBuildFile; fileRef = 276B5BF4207442DA00682681 /* CBLSocket.mm */; };
 		27A8B5021EC5350A00BB4C07 /* CBLQueryEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 27A8B5011EC5350A00BB4C07 /* CBLQueryEnumerator.h */; };
 		27A8B5131EC5351000BB4C07 /* CBLQueryEnumerator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27A8B5121EC5351000BB4C07 /* CBLQueryEnumerator.mm */; };
 		27B69A141F2A4C6D00782145 /* MYAnonymousIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */; };
@@ -80,6 +84,10 @@
 		27CDE761207407280082D458 /* CBLDocumentChangeNotifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 27CDE75E207407280082D458 /* CBLDocumentChangeNotifier.h */; };
 		27CDE762207407280082D458 /* CBLDocumentChangeNotifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27CDE75F207407280082D458 /* CBLDocumentChangeNotifier.mm */; };
 		27CDE763207407280082D458 /* CBLDocumentChangeNotifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27CDE75F207407280082D458 /* CBLDocumentChangeNotifier.mm */; };
+		27CDE780207427470082D458 /* CBLReplicatorHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27CDE77E207427460082D458 /* CBLReplicatorHost.mm */; };
+		27CDE781207427470082D458 /* CBLReplicatorHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27CDE77E207427460082D458 /* CBLReplicatorHost.mm */; };
+		27CDE782207427470082D458 /* CBLReplicatorHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 27CDE77F207427460082D458 /* CBLReplicatorHost.h */; };
+		27CDE783207427470082D458 /* CBLReplicatorHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 27CDE77F207427460082D458 /* CBLReplicatorHost.h */; };
 		27D721991F8E97F400AA4458 /* CBLFleece.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D721971F8E97F400AA4458 /* CBLFleece.hh */; };
 		27D7219A1F8E97F400AA4458 /* CBLFleece.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D721971F8E97F400AA4458 /* CBLFleece.hh */; };
 		27D7219B1F8E97F400AA4458 /* CBLFleece.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27D721981F8E97F400AA4458 /* CBLFleece.mm */; };
@@ -839,6 +847,8 @@
 		275FF6BE1E48081B005F90DD /* CouchbaseLite.exp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.exports; path = CouchbaseLite.exp; sourceTree = "<group>"; };
 		276740B51EE7381E0036DE42 /* CBLTrustCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLTrustCheck.h; sourceTree = "<group>"; };
 		276740B61EE7381E0036DE42 /* CBLTrustCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBLTrustCheck.m; sourceTree = "<group>"; };
+		276B5BF3207442DA00682681 /* CBLSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLSocket.h; sourceTree = "<group>"; };
+		276B5BF4207442DA00682681 /* CBLSocket.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLSocket.mm; sourceTree = "<group>"; };
 		2791EA6620327DCB00BD813C /* Project_Debug_EE.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_Debug_EE.xcconfig; sourceTree = "<group>"; };
 		2791EA6720327E8B00BD813C /* Project_Release_EE.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_Release_EE.xcconfig; sourceTree = "<group>"; };
 		27A8B5011EC5350A00BB4C07 /* CBLQueryEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBLQueryEnumerator.h; path = ../CBLQueryEnumerator.h; sourceTree = "<group>"; };
@@ -855,6 +865,8 @@
 		27BE3B551E4E93000012B74A /* PredicateQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PredicateQuery.swift; sourceTree = "<group>"; };
 		27CDE75E207407280082D458 /* CBLDocumentChangeNotifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLDocumentChangeNotifier.h; sourceTree = "<group>"; };
 		27CDE75F207407280082D458 /* CBLDocumentChangeNotifier.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLDocumentChangeNotifier.mm; sourceTree = "<group>"; };
+		27CDE77E207427460082D458 /* CBLReplicatorHost.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLReplicatorHost.mm; sourceTree = "<group>"; };
+		27CDE77F207427460082D458 /* CBLReplicatorHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicatorHost.h; sourceTree = "<group>"; };
 		27D721971F8E97F400AA4458 /* CBLFleece.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLFleece.hh; sourceTree = "<group>"; };
 		27D721981F8E97F400AA4458 /* CBLFleece.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLFleece.mm; sourceTree = "<group>"; };
 		27D721B81F904B2500AA4458 /* CBLNewDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLNewDictionary.h; sourceTree = "<group>"; };
@@ -1302,6 +1314,18 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		27CDE76D2074271D0082D458 /* Server */ = {
+			isa = PBXGroup;
+			children = (
+				27CDE77F207427460082D458 /* CBLReplicatorHost.h */,
+				27CDE77E207427460082D458 /* CBLReplicatorHost.mm */,
+				276B5BF3207442DA00682681 /* CBLSocket.h */,
+				276B5BF4207442DA00682681 /* CBLSocket.mm */,
+			);
+			name = Server;
+			path = "../../iOS-EE/P2P";
+			sourceTree = "<group>";
+		};
 		27D7ECFC1F2A851600828ECF /* Authenticators */ = {
 			isa = PBXGroup;
 			children = (
@@ -1558,6 +1582,7 @@
 			children = (
 				27D7ECFC1F2A851600828ECF /* Authenticators */,
 				93DBD01B2004BD0A0017CA83 /* Endpoints */,
+				27CDE76D2074271D0082D458 /* Server */,
 				275229C51E776BC100E630FA /* CBLReplicator.h */,
 				275229C61E776BC100E630FA /* CBLReplicator.mm */,
 				93B41CAE1F04706100A7F114 /* CBLReplicatorChange.h */,
@@ -1946,6 +1971,7 @@
 			files = (
 				938B36A5200745FF004485D8 /* CBLQueryResultArray.h in Headers */,
 				27F9619A1ED8D9440060F804 /* CBLReachability.h in Headers */,
+				27CDE783207427470082D458 /* CBLReplicatorHost.h in Headers */,
 				9383A5961F1EEFCD0083053D /* CBLQueryResult+Internal.h in Headers */,
 				934A27931F30E5CA003946A7 /* CBLBinaryExpression.h in Headers */,
 				27D7219A1F8E97F400AA4458 /* CBLFleece.hh in Headers */,
@@ -2034,6 +2060,7 @@
 				27CDE761207407280082D458 /* CBLDocumentChangeNotifier.h in Headers */,
 				937F02A11EFC7DBF00060D64 /* CBLQueryChange.h in Headers */,
 				934A27B81F30E810003946A7 /* CBLQuantifiedExpression.h in Headers */,
+				276B5BF6207442DA00682681 /* CBLSocket.h in Headers */,
 				9383A5901F1EE9550083053D /* CBLQueryResultSet+Internal.h in Headers */,
 				9374A853201165AE00BA0D9E /* CBLURLEndpoint+Internal.h in Headers */,
 				93B503651E64B07F002C4680 /* CBLStringBytes.h in Headers */,
@@ -2110,6 +2137,7 @@
 				939B1B5F2009C0F200FAA3CB /* CBLQueryVariableExpression+Internal.h in Headers */,
 				93B72063205CA6650069F5FC /* CBLException.h in Headers */,
 				934F4CA71E241FB500F90659 /* CBLBase64.h in Headers */,
+				276B5BF5207442DA00682681 /* CBLSocket.h in Headers */,
 				93B41D641F0580E700A7F114 /* CBLQueryJoin.h in Headers */,
 				93EC42EF1FB39DAD00D54BB4 /* CBLLiveQuery.h in Headers */,
 				93DBD0112004BCE00017CA83 /* CBLURLEndpoint.h in Headers */,
@@ -2160,6 +2188,7 @@
 				27F961991ED8D9440060F804 /* CBLReachability.h in Headers */,
 				93FD61492020446300E7F6A1 /* CBLQueryBuilder.h in Headers */,
 				934F4CAF1E241FB500F90659 /* CBLLog.h in Headers */,
+				27CDE782207427470082D458 /* CBLReplicatorHost.h in Headers */,
 				938195981EB97E7A0032CC51 /* CBLDocumentFragment.h in Headers */,
 				93CD024B1E9DA0AC00AFB3FA /* CBLC4Document.h in Headers */,
 				93CD02681E9FFEC500AFB3FA /* CBLArray.h in Headers */,
@@ -2695,6 +2724,7 @@
 				270AB2BF2073EF57009A4596 /* CBLChangeNotifier.m in Sources */,
 				27CDE763207407280082D458 /* CBLDocumentChangeNotifier.mm in Sources */,
 				93B41D671F0580E700A7F114 /* CBLQueryJoin.m in Sources */,
+				276B5BF8207442DA00682681 /* CBLSocket.mm in Sources */,
 				9308F40C1E64B23800F53EE4 /* Test_Assertions.m in Sources */,
 				9308F40B1E64B23600F53EE4 /* Test.m in Sources */,
 				9384D8211FC3F9DB00FE89D8 /* ArrayFunction.swift in Sources */,
@@ -2750,6 +2780,7 @@
 				9383A5811F1EE7860083053D /* CBLQueryRowsArray.mm in Sources */,
 				93EC42F61FB3AE7500D54BB4 /* ArrayExpression.swift in Sources */,
 				938CDF221E807F51002EE790 /* Expression.swift in Sources */,
+				27CDE781207427470082D458 /* CBLReplicatorHost.mm in Sources */,
 				2753AFF81EC39CA200C12E98 /* CBLHTTPLogic.m in Sources */,
 				938CDF1C1E807F23002EE790 /* Where.swift in Sources */,
 				275F92A61E4D3A91007FD5A2 /* MutableDocument.swift in Sources */,
@@ -2858,6 +2889,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27CDE780207427470082D458 /* CBLReplicatorHost.mm in Sources */,
 				9380C72B1E16E7D30011E8CB /* CBLDatabase.mm in Sources */,
 				937F026D1EFC662100060D64 /* CBLChangeListenerToken.m in Sources */,
 				270AB2BE2073EF57009A4596 /* CBLChangeNotifier.m in Sources */,
@@ -2935,6 +2967,7 @@
 				934F4C2A1E1EF19000F90659 /* MYErrorUtils.m in Sources */,
 				93EC42CD1FB3801E00D54BB4 /* CBLFullTextIndex.m in Sources */,
 				93DB7FEE1ED8E1C000C4F845 /* CBLReplicatorConfiguration.m in Sources */,
+				276B5BF7207442DA00682681 /* CBLSocket.mm in Sources */,
 				934F4C2C1E1EF19000F90659 /* MYLogging.m in Sources */,
 				93EC42E81FB3930E00D54BB4 /* CBLQueryArrayExpression.m in Sources */,
 				934F4C701E1EFAF600F90659 /* Test_Assertions.m in Sources */,
