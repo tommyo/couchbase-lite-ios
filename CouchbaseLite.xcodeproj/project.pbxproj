@@ -892,9 +892,9 @@
 		27BE65472076AA2E00322C23 /* CBLWebSocketListener.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLWebSocketListener.mm; sourceTree = "<group>"; };
 		27BE65482076AA2E00322C23 /* CBLServerWebSocket.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLServerWebSocket.mm; sourceTree = "<group>"; };
 		27BE65492076AA2E00322C23 /* CBLTCPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLTCPConnection.h; sourceTree = "<group>"; };
-		27BE655E2076ABE400322C23 /* CBLMessageEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CBLMessageEndpoint.h; path = ../../P2P/CBLMessageEndpoint.h; sourceTree = "<group>"; };
-		27BE655F2076ABE400322C23 /* CBLMessageEndpoint.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = CBLMessageEndpoint.mm; path = ../../P2P/CBLMessageEndpoint.mm; sourceTree = "<group>"; };
-		27BE65602076ABE500322C23 /* CBLMessageEndpoint+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CBLMessageEndpoint+Internal.h"; path = "../../P2P/CBLMessageEndpoint+Internal.h"; sourceTree = "<group>"; };
+		27BE655E2076ABE400322C23 /* CBLMessageEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLMessageEndpoint.h; sourceTree = "<group>"; };
+		27BE655F2076ABE400322C23 /* CBLMessageEndpoint.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLMessageEndpoint.mm; sourceTree = "<group>"; };
+		27BE65602076ABE500322C23 /* CBLMessageEndpoint+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CBLMessageEndpoint+Internal.h"; sourceTree = "<group>"; };
 		27BE65672076B3EF00322C23 /* LiteServ */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LiteServ; sourceTree = BUILT_PRODUCTS_DIR; };
 		27BE65712076C38900322C23 /* LiteServ.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LiteServ.m; sourceTree = "<group>"; };
 		27CDE75E207407280082D458 /* CBLDocumentChangeNotifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLDocumentChangeNotifier.h; sourceTree = "<group>"; };
@@ -1374,14 +1374,17 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		27CDE76D2074271D0082D458 /* Server */ = {
+		27CDE76D2074271D0082D458 /* EE */ = {
 			isa = PBXGroup;
 			children = (
 				27BE65422076AA2D00322C23 /* CBLMessageConnection.h */,
+				27BE655E2076ABE400322C23 /* CBLMessageEndpoint.h */,
+				27BE655F2076ABE400322C23 /* CBLMessageEndpoint.mm */,
+				27BE65602076ABE500322C23 /* CBLMessageEndpoint+Internal.h */,
 				27CDE77F207427460082D458 /* CBLReplicatorHost.h */,
 				27CDE77E207427460082D458 /* CBLReplicatorHost.mm */,
 			);
-			name = Server;
+			name = EE;
 			path = ../../P2P;
 			sourceTree = "<group>";
 		};
@@ -1641,7 +1644,7 @@
 			children = (
 				27D7ECFC1F2A851600828ECF /* Authenticators */,
 				93DBD01B2004BD0A0017CA83 /* Endpoints */,
-				27CDE76D2074271D0082D458 /* Server */,
+				27CDE76D2074271D0082D458 /* EE */,
 				275229C51E776BC100E630FA /* CBLReplicator.h */,
 				275229C61E776BC100E630FA /* CBLReplicator.mm */,
 				93B41CAE1F04706100A7F114 /* CBLReplicatorChange.h */,
@@ -1959,9 +1962,6 @@
 				93DBCFF42004B5FD0017CA83 /* CBLEndpoint.h */,
 				93DBD0152004BCF00017CA83 /* CBLDatabaseEndpoint.h */,
 				93DBD0162004BCF00017CA83 /* CBLDatabaseEndpoint.m */,
-				27BE655E2076ABE400322C23 /* CBLMessageEndpoint.h */,
-				27BE655F2076ABE400322C23 /* CBLMessageEndpoint.mm */,
-				27BE65602076ABE500322C23 /* CBLMessageEndpoint+Internal.h */,
 				93DBD00F2004BCE00017CA83 /* CBLURLEndpoint.h */,
 				93DBD0102004BCE00017CA83 /* CBLURLEndpoint.m */,
 			);

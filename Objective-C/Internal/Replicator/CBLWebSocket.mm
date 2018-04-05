@@ -67,7 +67,7 @@ static constexpr NSTimeInterval kIdleTimeout = 320.0;
 
 + (C4SocketFactory) socketFactory {
     return {
-        .providesWebSockets = false,
+        .framing = kC4WebSocketClientFraming,
         .open = &doOpen,
         .close = &doClose,
         .write = &doWrite,
