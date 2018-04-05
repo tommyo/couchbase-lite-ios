@@ -191,8 +191,7 @@ static void doCompletedReceive(C4Socket* s, size_t byteCount) {
     (void)SecRandomCopyBytes(kSecRandomDefault, sizeof(nonceBytes), nonceBytes);
     NSData* nonceData = [NSData dataWithBytes: nonceBytes length: sizeof(nonceBytes)];
     NSString* nonceKey = [nonceData base64EncodedStringWithOptions: 0];
-    _expectedAcceptHeader = base64Digest([nonceKey stringByAppendingString:
-                                          @"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"]);
+    _expectedAcceptHeader = [[self class] webSocketAcceptHeaderForKey: nonceKey];
 
     // Construct the HTTP request:
     for (Dict::iterator header(_options[kC4ReplicatorOptionExtraHeaders].asDict()); header; ++header)
@@ -568,8 +567,11 @@ static BOOL checkHeader(NSDictionary* headers, NSString* header, NSString* expec
 }
 
 
-static NSString* base64Digest(NSString* string) {
-    NSData* data = [string dataUsingEncoding: NSASCIIStringEncoding];
++ (nullable NSString*) webSocketAcceptHeaderForKey: (NSString*)key {
+    key = [key stringByAppendingString: @"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"];
+    NSData* data = [key dataUsingEncoding: NSASCIIStringEncoding];
+    if (!data)
+        return nil;
     unsigned char result[CC_SHA1_DIGEST_LENGTH];
     CC_SHA1([data bytes], (CC_LONG)[data length], result);
     data = [NSData dataWithBytes:result length:CC_SHA1_DIGEST_LENGTH];
