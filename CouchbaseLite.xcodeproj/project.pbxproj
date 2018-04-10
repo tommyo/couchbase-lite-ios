@@ -838,6 +838,7 @@
 		270AB2BA2073EF57009A4596 /* CBLChangeNotifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLChangeNotifier.h; sourceTree = "<group>"; };
 		270AB2BB2073EF57009A4596 /* CBLChangeNotifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBLChangeNotifier.m; sourceTree = "<group>"; };
 		2728509C1E99CA4D009CA22F /* CBLReplicator+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CBLReplicator+Internal.h"; path = "../CBLReplicator+Internal.h"; sourceTree = "<group>"; };
+		27331D7E207D31E300D4A012 /* CBLWebSocketListener+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CBLWebSocketListener+Internal.h"; sourceTree = "<group>"; };
 		27476651201912B5007B39D1 /* CBLErrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLErrors.h; sourceTree = "<group>"; };
 		274D6C272011529D00DAB7DD /* CBLLog+Admin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CBLLog+Admin.h"; sourceTree = "<group>"; };
 		275229C51E776BC100E630FA /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
@@ -1340,13 +1341,14 @@
 		278C73CC2076A9AC0016A061 /* EE */ = {
 			isa = PBXGroup;
 			children = (
-				27BE65412076AA2D00322C23 /* CBLServerWebSocket.h */,
-				27BE65482076AA2E00322C23 /* CBLServerWebSocket.mm */,
 				276B5BF3207442DA00682681 /* CBLSocket.h */,
 				276B5BF4207442DA00682681 /* CBLSocket.mm */,
+				27BE65412076AA2D00322C23 /* CBLServerWebSocket.h */,
+				27BE65482076AA2E00322C23 /* CBLServerWebSocket.mm */,
 				27BE65492076AA2E00322C23 /* CBLTCPConnection.h */,
 				27BE65462076AA2E00322C23 /* CBLTCPConnection.mm */,
 				27BE65402076AA2D00322C23 /* CBLWebSocketListener.h */,
+				27331D7E207D31E300D4A012 /* CBLWebSocketListener+Internal.h */,
 				27BE65472076AA2E00322C23 /* CBLWebSocketListener.mm */,
 				27BE65712076C38900322C23 /* LiteServ.m */,
 			);

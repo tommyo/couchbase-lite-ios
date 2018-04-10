@@ -66,6 +66,7 @@ BOOL convertError(const FLError &flErr, NSError** outError) {
 
 
 void convertError(NSError* error, C4Error *outError) {
+    Assert(error);
     C4Error c4err = {LiteCoreDomain, kC4ErrorRemoteError};
     NSString* domain = error.domain;
     const char *message = error.localizedFailureReason.UTF8String ?: "";

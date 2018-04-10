@@ -73,3 +73,5 @@ _kCBLAllPropertiesName
 
 # EE Only:
 .objc_class_name_CBLDatabaseEndpoint
+.objc_class_name_CBLMessageEndpoint
+.objc_class_name_CBLWebSocketListener
