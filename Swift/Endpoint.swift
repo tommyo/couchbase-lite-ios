@@ -29,28 +29,6 @@ public protocol Endpoint {
     func toImpl() -> CBLEndpoint;
 }
 
-#if COUCHBASE_ENTERPRISE
-/// Database based replication target endpoint. Available in the Enterprise Edition only.
-public struct DatabaseEndpoint: IEndpoint {
-    
-    /// The database object.
-    public let database: Database
-    
-    /// Initializes the DatabaseEndpoint with the database object.
-    ///
-    /// - Parameter database: The database object.
-    public init(database: Database) {
-        self.database = database
-    }
-    
-    // MARK: Internal
-    
-    func toImpl() -> CBLEndpoint {
-        return CBLDatabaseEndpoint(database: self.database._impl)
-    }
-}    
-#endif
-
 /// URL based replication target endpoint.
 public struct URLEndpoint: IEndpoint {
     
@@ -63,12 +41,16 @@ public struct URLEndpoint: IEndpoint {
     /// - Parameter url: The URL object.
     public init(url: URL) {
         self.url = url
+        self.impl = CBLURLEndpoint(url: self.url)
     }
     
     // MARK: Internal
     
+    // Use Any to workaround string interpolation crash
+    private var impl: Any
+    
     func toImpl() -> CBLEndpoint {
-        return CBLURLEndpoint(url: url)
+        return self.impl as! CBLEndpoint
     }
     
 }
