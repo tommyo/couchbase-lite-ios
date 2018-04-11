@@ -3562,7 +3562,7 @@
 			attributes = {
 				CLASSPREFIX = CBL;
 				LastSwiftUpdateCheck = 0820;
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Couchbase;
 				TargetAttributes = {
 					270AF625207D8C8E0039FF49 = {

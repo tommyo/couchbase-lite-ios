@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "27BE65662076B3EF00322C23"
+               BlueprintIdentifier = "270AF625207D8C8E0039FF49"
                BuildableName = "LiteServ"
                BlueprintName = "LiteServ"
                ReferencedContainer = "container:CouchbaseLite.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27BE65662076B3EF00322C23"
+            BlueprintIdentifier = "270AF625207D8C8E0039FF49"
             BuildableName = "LiteServ"
             BlueprintName = "LiteServ"
             ReferencedContainer = "container:CouchbaseLite.xcodeproj">
@@ -55,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27BE65662076B3EF00322C23"
+            BlueprintIdentifier = "270AF625207D8C8E0039FF49"
             BuildableName = "LiteServ"
             BlueprintName = "LiteServ"
             ReferencedContainer = "container:CouchbaseLite.xcodeproj">
@@ -80,7 +80,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27BE65662076B3EF00322C23"
+            BlueprintIdentifier = "270AF625207D8C8E0039FF49"
             BuildableName = "LiteServ"
             BlueprintName = "LiteServ"
             ReferencedContainer = "container:CouchbaseLite.xcodeproj">
