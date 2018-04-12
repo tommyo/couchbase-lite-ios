@@ -1187,6 +1187,13 @@
 			remoteGlobalIDString = 9343EF2A207D611600F19A89;
 			remoteInfo = "CBL-EE ObjC";
 		};
+		2726F635207EE988007F2D02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9398D9091E03434200464432 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9343EF2A207D611600F19A89;
+			remoteInfo = "CBL-EE ObjC";
+		};
 		273E555B1F79AF5E000182F1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9398D9311E0347B600464432 /* LiteCore.xcodeproj */;
@@ -1291,13 +1298,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 27EF80F91917EEC600A327B9;
 			remoteInfo = "LiteCore static";
-		};
-		9343F137207D61EC00F19A89 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9398D9091E03434200464432 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9398D9111E03434200464432;
-			remoteInfo = CouchbaseLite;
 		};
 		9343F155207D62C900F19A89 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2013,11 +2013,11 @@
 		27331DC4207D8B0600D4A012 /* EE */ = {
 			isa = PBXGroup;
 			children = (
+				27331DC7207D8B1E00D4A012 /* CBLSocket.h */,
+				27331DC6207D8B1E00D4A012 /* CBLSocket.mm */,
 				27331DC9207D8B1E00D4A012 /* CBLMessageEndpoint+Internal.h */,
 				27331DC8207D8B1E00D4A012 /* CBLServerWebSocket.h */,
 				27331DCB207D8B1F00D4A012 /* CBLServerWebSocket.mm */,
-				27331DC7207D8B1E00D4A012 /* CBLSocket.h */,
-				27331DC6207D8B1E00D4A012 /* CBLSocket.mm */,
 				27331DCD207D8B1F00D4A012 /* CBLTCPConnection.h */,
 				27331DCC207D8B1F00D4A012 /* CBLTCPConnection.mm */,
 				27331DC5207D8B1E00D4A012 /* CBLWebSocketListener+Internal.h */,
@@ -3400,7 +3400,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				9343F136207D61EC00F19A89 /* PBXTargetDependency */,
+				2726F636207EE988007F2D02 /* PBXTargetDependency */,
 			);
 			name = "CBL-EE ObjC Tests";
 			productName = CouchbaseLiteTests;
@@ -4688,6 +4688,11 @@
 			target = 9343EF2A207D611600F19A89 /* CBL-EE ObjC */;
 			targetProxy = 270AF643207D8D5A0039FF49 /* PBXContainerItemProxy */;
 		};
+		2726F636207EE988007F2D02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9343EF2A207D611600F19A89 /* CBL-EE ObjC */;
+			targetProxy = 2726F635207EE988007F2D02 /* PBXContainerItemProxy */;
+		};
 		275F927F1E4D30A4007FD5A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 275F92731E4D30A4007FD5A2 /* CBL Swift */;
@@ -4727,11 +4732,6 @@
 			isa = PBXTargetDependency;
 			name = "LiteCore static";
 			targetProxy = 9343F013207D61AB00F19A89 /* PBXContainerItemProxy */;
-		};
-		9343F136207D61EC00F19A89 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9398D9111E03434200464432 /* CBL ObjC */;
-			targetProxy = 9343F137207D61EC00F19A89 /* PBXContainerItemProxy */;
 		};
 		9343F154207D62C900F19A89 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
