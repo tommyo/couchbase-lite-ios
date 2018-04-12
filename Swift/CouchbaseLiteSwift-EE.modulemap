@@ -83,5 +83,11 @@ framework module CouchbaseLiteSwift {
         header "CBLArray+Swift.h"
         header "CBLBlob+Swift.h"
         header "CBLDictionary+Swift.h"
+        
+        // Enterprise:
+        header "CBLDatabaseConfiguration+Encryption.h"
+        header "CBLDatabaseEndpoint.h"
+        header "CBLDatabase+Encryption.h"
+        header "CBLEncryptionKey.h"
     }
 }

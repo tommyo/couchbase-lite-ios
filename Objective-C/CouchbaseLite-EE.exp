@@ -71,7 +71,8 @@
 _CBLErrorDomain
 _kCBLAllPropertiesName
 
-# EE Only:
+# Enterprise Edition:
 .objc_class_name_CBLDatabaseEndpoint
 .objc_class_name_CBLMessageEndpoint
 .objc_class_name_CBLWebSocketListener
+.objc_class_name_CBLEncryptionKey
