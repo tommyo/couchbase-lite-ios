@@ -103,6 +103,10 @@
 		27A8B5131EC5351000BB4C07 /* CBLQueryEnumerator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27A8B5121EC5351000BB4C07 /* CBLQueryEnumerator.mm */; };
 		27B69A141F2A4C6D00782145 /* MYAnonymousIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */; };
 		27B69A151F2A4C6D00782145 /* MYAnonymousIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */; };
+		27BC147F207FD69C0068155C /* CBLMultipeerConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 27BC147D207FD69C0068155C /* CBLMultipeerConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		27BC1480207FD69C0068155C /* CBLMultipeerConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 27BC147D207FD69C0068155C /* CBLMultipeerConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		27BC1481207FD69C0068155C /* CBLMultipeerConnection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27BC147E207FD69C0068155C /* CBLMultipeerConnection.mm */; };
+		27BC1482207FD69C0068155C /* CBLMultipeerConnection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27BC147E207FD69C0068155C /* CBLMultipeerConnection.mm */; };
 		27BE3B461E4D662B0012B74A /* Test_Assertions.m in Sources */ = {isa = PBXBuildFile; fileRef = 934F4C6F1E1EFAF600F90659 /* Test_Assertions.m */; };
 		27BE3B4B1E4E46120012B74A /* CBLTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BE3B4A1E4E46120012B74A /* CBLTestCase.swift */; };
 		27BE3B4D1E4E51C80012B74A /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BE3B4C1E4E51C80012B74A /* DatabaseTest.swift */; };
@@ -1555,6 +1559,8 @@
 		27B699FC1F2A449800782145 /* CBLClientCertAuthenticator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBLClientCertAuthenticator.m; sourceTree = "<group>"; };
 		27B69A121F2A4B7400782145 /* MYAnonymousIdentity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MYAnonymousIdentity.h; sourceTree = "<group>"; };
 		27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MYAnonymousIdentity.m; sourceTree = "<group>"; };
+		27BC147D207FD69C0068155C /* CBLMultipeerConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLMultipeerConnection.h; sourceTree = "<group>"; };
+		27BC147E207FD69C0068155C /* CBLMultipeerConnection.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLMultipeerConnection.mm; sourceTree = "<group>"; };
 		27BE3B451E4D63AF0012B74A /* CBL Swift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "CBL Swift.xcconfig"; sourceTree = "<group>"; };
 		27BE3B4A1E4E46120012B74A /* CBLTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CBLTestCase.swift; sourceTree = "<group>"; };
 		27BE3B4C1E4E51C80012B74A /* DatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseTest.swift; sourceTree = "<group>"; };
@@ -2032,6 +2038,8 @@
 				27331DB1207D8AFF00D4A012 /* CBLReplicatorHost.mm */,
 				27331DB5207D8AFF00D4A012 /* CBLWebSocketListener.h */,
 				27331DB0207D8AFF00D4A012 /* CBLWebSocketListener.mm */,
+				27BC147D207FD69C0068155C /* CBLMultipeerConnection.h */,
+				27BC147E207FD69C0068155C /* CBLMultipeerConnection.mm */,
 			);
 			name = EE;
 			path = "../../Sources/Objective-C/P2P";
@@ -3017,6 +3025,7 @@
 				9343EFD2207D611600F19A89 /* CBLCompoundExpression.h in Headers */,
 				9343EFD3207D611600F19A89 /* CBLQueryVariableExpression.h in Headers */,
 				9369A6A6207DC7CB009B5B83 /* CBLDatabase+EncryptionInternal.h in Headers */,
+				27BC147F207FD69C0068155C /* CBLMultipeerConnection.h in Headers */,
 				9343EFD4207D611600F19A89 /* CBLAggregateExpression.h in Headers */,
 				9343EFD5207D611600F19A89 /* CBLDocument+Internal.h in Headers */,
 				9343EFD6207D611600F19A89 /* CBLQueryLimit.h in Headers */,
@@ -3117,6 +3126,7 @@
 				9343F0D4207D61AB00F19A89 /* CBLDictionaryFragment.h in Headers */,
 				27331DB7207D8AFF00D4A012 /* CBLMessageEndpoint.h in Headers */,
 				9343F0D5207D61AB00F19A89 /* CBLQueryMeta.h in Headers */,
+				27BC1480207FD69C0068155C /* CBLMultipeerConnection.h in Headers */,
 				9343F0D6207D61AB00F19A89 /* CBLIndexBuilder.h in Headers */,
 				9343F0D7207D61AB00F19A89 /* CBLAuthenticator.h in Headers */,
 				9343F0D8207D61AB00F19A89 /* CBLEndpoint.h in Headers */,
@@ -4309,6 +4319,7 @@
 				9343EF72207D611600F19A89 /* CBLQueryVariableExpression.m in Sources */,
 				9343EF73207D611600F19A89 /* CBLQuery.mm in Sources */,
 				9369A6AA207DC8CA009B5B83 /* CBLDatabase+EncryptionInternal.mm in Sources */,
+				27BC1481207FD69C0068155C /* CBLMultipeerConnection.mm in Sources */,
 				9343EF74207D611600F19A89 /* CBLArray.mm in Sources */,
 				9343EF75207D611600F19A89 /* CBLQuantifiedExpression.m in Sources */,
 				9343EF76207D611600F19A89 /* CBLCoreBridge.mm in Sources */,
@@ -4483,6 +4494,7 @@
 				27331DDD207D8B1F00D4A012 /* CBLTCPConnection.mm in Sources */,
 				9343F095207D61AB00F19A89 /* From.swift in Sources */,
 				9343F096207D61AB00F19A89 /* GroupByRouter.swift in Sources */,
+				27BC1482207FD69C0068155C /* CBLMultipeerConnection.mm in Sources */,
 				9343F097207D61AB00F19A89 /* CBLQueryDataSource.m in Sources */,
 				9343F098207D61AB00F19A89 /* CBLNewDictionary.mm in Sources */,
 				9343F099207D61AB00F19A89 /* Select.swift in Sources */,

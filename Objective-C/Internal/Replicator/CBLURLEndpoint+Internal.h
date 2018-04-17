@@ -17,6 +17,9 @@
 //  limitations under the License.
 //
 
+#import "CBLURLEndpoint.h"
+
+
 extern NSString* const kCBLURLEndpointScheme;
 extern NSString* const kCBLURLEndpointTLSScheme;
 

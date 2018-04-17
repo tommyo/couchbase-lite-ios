@@ -165,8 +165,8 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
 
     // Target:
     id<CBLEndpoint> endpoint = _config.target;
-    C4Address addr;
-    CBLDatabase* otherDB;
+    C4Address addr = {};
+    CBLDatabase* otherDB = nil;
     NSURL* remoteURL = $castIf(CBLURLEndpoint, endpoint).url;
     CBLStringBytes dbName(remoteURL.path.lastPathComponent);
     CBLStringBytes scheme(remoteURL.scheme);
@@ -183,8 +183,7 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         };
     } else {
 #ifdef COUCHBASE_ENTERPRISE
-        otherDB = $cast(CBLDatabaseEndpoint, endpoint).database;
-        Assert(otherDB);
+        otherDB = $castIf(CBLDatabaseEndpoint, endpoint).database;
 #else
         Assert(remoteURL, @"Endpoint has no URL");
 #endif
@@ -208,13 +207,15 @@ static NSTimeInterval retryDelay(unsigned retryCount) {
         optionsFleece = enc.finish();
     }
 
-    C4SocketFactory socketFactory;
+    C4SocketFactory socketFactory = { };
 #ifdef COUCHBASE_ENTERPRISE
     auto messageEndpoint = $castIf(CBLMessageEndpoint, endpoint);
-    if (messageEndpoint)
+    if (messageEndpoint) {
         socketFactory = messageEndpoint.socketFactory;
-    else
+        addr.scheme = C4STR("x-msg-endpt"); // put something in the address so it's not illegal
+    } else
 #endif
+    if (remoteURL)
         socketFactory = CBLWebSocket.socketFactory;
     socketFactory.context = (__bridge void*)self;
 

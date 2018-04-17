@@ -80,16 +80,21 @@ static void doOpen(C4Socket* s, const C4Address* addr, C4Slice optionsFleece, vo
     NSURLComponents* c = [NSURLComponents new];
     if (addr->scheme == "blips"_sl || addr->scheme == "wss"_sl)
         c.scheme = @"https";
-    else
+    else if (addr->scheme == "blip"_sl || addr->scheme == "ws"_sl)
         c.scheme = @"http";
+    else {
+        c4socket_closed(s, {LiteCoreDomain, kC4NetErrInvalidURL});
+        return;
+    }
     c.host = slice2string(addr->hostname);
     c.port = @(addr->port);
     c.path = slice2string(addr->path);
     NSURL* url = c.URL;
     if (!url) {
-        c4socket_closed(s, {LiteCoreDomain, kC4ErrorInvalidParameter});
+        c4socket_closed(s, {LiteCoreDomain, kC4NetErrInvalidURL});
         return;
     }
+    
     auto socket = [[CBLWebSocket alloc] initWithURL: url c4socket: s options: optionsFleece];
     s->nativeHandle = (__bridge void*)socket;
     [socket start];

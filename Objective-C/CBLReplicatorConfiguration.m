@@ -21,7 +21,9 @@
 #import "CBLAuthenticator+Internal.h"
 #import "CBLReplicator+Internal.h"
 #import "CBLDatabase+Internal.h"
+#import "CBLMessageEndpoint.h"
 #import "CBLVersion.h"
+
 
 @implementation CBLReplicatorConfiguration {
     BOOL _readonly;
@@ -172,7 +174,13 @@
         options[@kC4ReplicatorCheckpointInterval] = @(_checkpointInterval);
     if (_heartbeatInterval > 0)
         options[@kC4ReplicatorHeartbeatInterval] = @(_heartbeatInterval);
-    
+
+#ifdef COUCHBASE_ENTERPRISE
+    NSString* uniqueID = $castIf(CBLMessageEndpoint, _target).uniqueIdentifier;
+    if (uniqueID)
+        options[@kC4ReplicatorOptionRemoteDBUniqueID] = uniqueID;
+#endif
+
     return options;
 }
 
