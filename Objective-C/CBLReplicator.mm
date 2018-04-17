@@ -22,8 +22,8 @@
 #import "CBLReplicatorChange+Internal.h"
 #import "CBLReplicatorConfiguration.h"
 #import "CBLURLEndpoint.h"
-#import "CBLDatabaseEndpoint.h"
 #ifdef COUCHBASE_ENTERPRISE
+#import "CBLDatabaseEndpoint.h"
 #import "CBLMessageEndpoint+Internal.h"
 #endif
 
