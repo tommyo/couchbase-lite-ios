@@ -26,6 +26,7 @@
 #import "CBLLog.h"
 #import "CBLReplicator+Internal.h"
 #import "c4Socket.h"
+#import "MYURLUtils.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <dispatch/dispatch.h>
 #import <memory>
@@ -86,6 +87,9 @@ struct PendingWrite {
     std::vector<PendingWrite> _pendingWrites;
     bool _hasBytes, _hasSpace;
     bool _gotResponseHeaders;
+    BOOL _requestedClose;
+    BOOL _connectingToProxy;
+    NSDictionary* _proxySettings;
 }
 
 
@@ -152,6 +156,22 @@ static void doDispose(C4Socket* s) {
         request.HTTPShouldHandleCookies = NO;
         _logic = [[CBLHTTPLogic alloc] initWithURLRequest: request];
         _logic.handleRedirects = YES;
+
+        slice proxy = _options["HTTPProxy"_sl].asString();      //TODO: Add to c4Replicator.h
+        if (proxy) {
+            NSURL* proxyURL = [NSURL URLWithDataRepresentation: proxy.uncopiedNSData()
+                                                 relativeToURL: nil];
+            NSString* host = proxyURL.host;
+            if ([proxyURL.scheme.lowercaseString hasPrefix: @"http"] && host) {
+                _logic.proxySettings = @{(id)kCFProxyTypeKey:       (id)kCFProxyTypeHTTP,
+                                         (id)kCFProxyHostNameKey:   host,
+                                         (id)kCFProxyPortNumberKey: @(proxyURL.my_effectivePort)};
+            } else {
+                CBLWarn(Sync, @"Invalid replicator HTTPProxy setting <%.*s>",
+                     (int)proxy.size, proxy.buf);
+            }
+        }
+        _proxySettings = _logic.proxySettings;
 
         [self setupAuth];
 
@@ -222,16 +242,57 @@ static void doDispose(C4Socket* s) {
 
 
 - (void) start {
-    dispatch_async(_queue, ^{[self _start];});
+    dispatch_async(_queue, ^{
+        _logic.proxySettings = _proxySettings;
+        _logic.useProxyCONNECT = YES;
+        _connectingToProxy = _logic.usingHTTPProxy;
+
+        _hasBytes = _hasSpace = _gotResponseHeaders = _checkSSLCert = false;
+        if (_httpResponse)
+            CFRelease(_httpResponse);
+        _httpResponse = CFHTTPMessageCreateEmpty(NULL, false);
+
+        // Open the streams:
+        NSInputStream *inStream;
+        NSOutputStream *outStream;
+        [NSStream getStreamsToHostWithName: _logic.URL.host port: _logic.port
+                               inputStream: &inStream outputStream: &outStream];
+        _in = inStream;
+        _out = outStream;
+        CFReadStreamSetDispatchQueue((__bridge CFReadStreamRef)_in, _queue);
+        CFWriteStreamSetDispatchQueue((__bridge CFWriteStreamRef)_out, _queue);
+        _in.delegate = _out.delegate = self;
+        if (_logic.useTLS) {
+            auto settings = CFDictionaryCreateMutable(nullptr, 0, nullptr, nullptr);
+            if (_options[kC4ReplicatorOptionPinnedServerCert])
+                CFDictionarySetValue(settings, kCFStreamSSLValidatesCertificateChain, kCFBooleanFalse);
+            CFReadStreamSetProperty((__bridge CFReadStreamRef)_in,
+                                    kCFStreamPropertySSLSettings, settings);
+            CFRelease(settings);
+            _checkSSLCert = true;
+        }
+        [_in open];
+        [_out open];
+
+        if (_connectingToProxy)
+            [self _connectToProxy];
+        else
+            [self _connectToServer];
+    });
 }
 
 
-- (void) _start {
+- (void) _connectToProxy {
+    CBLLog(WebSocket, @"CBLWebSocket connecting to HTTP proxy %@:%d...",
+           _logic.directHost, _logic.directPort);
+    [self writeData: _logic.HTTPRequestData completionHandler: ^() {
+       CBLLogVerbose(WebSocket, @"CBLWebSocket Sent CONNECT request to proxy...");
+    }];
+}
+
+
+- (void) _connectToServer {
     CBLLog(WebSocket, @"CBLWebSocket connecting to %@:%d...", _logic.URL.host, _logic.port);
-    _hasBytes = _hasSpace = _gotResponseHeaders = _checkSSLCert = false;
-    if (_httpResponse)
-        CFRelease(_httpResponse);
-    _httpResponse = CFHTTPMessageCreateEmpty(NULL, false);
 
     // Configure the nonce/key for the request:
     uint8_t nonceBytes[16];
@@ -256,30 +317,8 @@ static void doDispose(C4Socket* s) {
     if (protocols)
         _logic[@"Sec-WebSocket-Protocol"] = protocols.asNSString();
 
-    // Open the streams:
-    NSInputStream *inStream;
-    NSOutputStream *outStream;
-    [NSStream getStreamsToHostWithName: _logic.URL.host port: _logic.port
-                           inputStream: &inStream outputStream: &outStream];
-    _in = inStream;
-    _out = outStream;
-    CFReadStreamSetDispatchQueue((__bridge CFReadStreamRef)_in, _queue);
-    CFWriteStreamSetDispatchQueue((__bridge CFWriteStreamRef)_out, _queue);
-    _in.delegate = _out.delegate = self;
-    if (_logic.useTLS) {
-        auto settings = CFDictionaryCreateMutable(nullptr, 0, nullptr, nullptr);
-        if (_options[kC4ReplicatorOptionPinnedServerCert])
-            CFDictionarySetValue(settings, kCFStreamSSLValidatesCertificateChain, kCFBooleanFalse);
-        CFReadStreamSetProperty((__bridge CFReadStreamRef)_in,
-                                kCFStreamPropertySSLSettings, settings);
-        CFRelease(settings);
-        _checkSSLCert = true;
-    }
-    [_in open];
-    [_out open];
-
     [self writeData: _logic.HTTPRequestData completionHandler: ^() {
-       CBLLogVerbose(WebSocket, @"CBLWebSocket Sent HTTP request...");
+        CBLLogVerbose(WebSocket, @"CBLWebSocket Sent HTTP request...");
     }];
 
     _keepMeAlive = self;
@@ -299,8 +338,27 @@ static void doDispose(C4Socket* s) {
         _gotResponseHeaders = YES;
         auto httpResponse = _httpResponse;
         _httpResponse = nullptr;
-        [self receivedHTTPResponse: httpResponse];
+        if (_connectingToProxy)
+            [self receivedProxyHTTPResponse: httpResponse];
+        else
+            [self receivedHTTPResponse: httpResponse];
         CFRelease(httpResponse);
+    }
+}
+
+
+- (void) receivedProxyHTTPResponse: (CFHTTPMessageRef)httpResponse {
+    [_logic receivedResponse: httpResponse];
+    NSInteger httpStatus = _logic.httpStatus;
+    if (httpStatus == 200) {
+        // Now send the actual WebSocket GET request:
+        _connectingToProxy = NO;
+        _logic.proxySettings = nil;
+        _logic.useProxyCONNECT = NO;
+        [self _connectToServer];
+    } else {
+        [self didCloseWithCode: (C4WebSocketCloseCode)httpStatus
+                        reason: $sprintf(@"Proxy: %@", _logic.httpStatusMessage)];
     }
 }
 
@@ -337,8 +395,7 @@ static void doDispose(C4Socket* s) {
         C4WebSocketCloseCode closeCode = kWebSocketClosePolicyError;
         if (httpStatus >= 300 && httpStatus < 1000)
             closeCode = (C4WebSocketCloseCode)httpStatus;
-        NSString* reason = CFBridgingRelease(CFHTTPMessageCopyResponseStatusLine(httpResponse));
-        [self didCloseWithCode: closeCode reason: reason];
+        [self didCloseWithCode: closeCode reason: _logic.httpStatusMessage];
 
     } else if (!checkHeader(headers, @"Connection", @"Upgrade", NO)) {
         [self didCloseWithCode: kWebSocketCloseProtocolError

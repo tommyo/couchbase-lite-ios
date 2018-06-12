@@ -69,6 +69,14 @@
 		27A8B5131EC5351000BB4C07 /* CBLQueryEnumerator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27A8B5121EC5351000BB4C07 /* CBLQueryEnumerator.mm */; };
 		27B69A141F2A4C6D00782145 /* MYAnonymousIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */; };
 		27B69A151F2A4C6D00782145 /* MYAnonymousIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */; };
+		27BD57C020D077CC00A48242 /* MYURLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27BD57AE20D077CC00A48242 /* MYURLUtils.h */; };
+		27BD57C120D077CC00A48242 /* MYURLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27BD57AE20D077CC00A48242 /* MYURLUtils.h */; };
+		27BD57C220D077CC00A48242 /* MYURLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27BD57AE20D077CC00A48242 /* MYURLUtils.h */; };
+		27BD57C320D077CC00A48242 /* MYURLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 27BD57AE20D077CC00A48242 /* MYURLUtils.h */; };
+		27BD57C420D077CC00A48242 /* MYURLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 27BD57BF20D077CC00A48242 /* MYURLUtils.m */; };
+		27BD57C520D077CC00A48242 /* MYURLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 27BD57BF20D077CC00A48242 /* MYURLUtils.m */; };
+		27BD57C620D077CC00A48242 /* MYURLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 27BD57BF20D077CC00A48242 /* MYURLUtils.m */; };
+		27BD57C720D077CC00A48242 /* MYURLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 27BD57BF20D077CC00A48242 /* MYURLUtils.m */; };
 		27BE3B461E4D662B0012B74A /* Test_Assertions.m in Sources */ = {isa = PBXBuildFile; fileRef = 934F4C6F1E1EFAF600F90659 /* Test_Assertions.m */; };
 		27BE3B4B1E4E46120012B74A /* CBLTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BE3B4A1E4E46120012B74A /* CBLTestCase.swift */; };
 		27BE3B4D1E4E51C80012B74A /* DatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BE3B4C1E4E51C80012B74A /* DatabaseTest.swift */; };
@@ -1516,6 +1524,8 @@
 		27B699FC1F2A449800782145 /* CBLClientCertAuthenticator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBLClientCertAuthenticator.m; sourceTree = "<group>"; };
 		27B69A121F2A4B7400782145 /* MYAnonymousIdentity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MYAnonymousIdentity.h; sourceTree = "<group>"; };
 		27B69A131F2A4B7400782145 /* MYAnonymousIdentity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MYAnonymousIdentity.m; sourceTree = "<group>"; };
+		27BD57AE20D077CC00A48242 /* MYURLUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MYURLUtils.h; sourceTree = "<group>"; };
+		27BD57BF20D077CC00A48242 /* MYURLUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MYURLUtils.m; sourceTree = "<group>"; };
 		27BE3B451E4D63AF0012B74A /* CBL Swift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "CBL Swift.xcconfig"; sourceTree = "<group>"; };
 		27BE3B4A1E4E46120012B74A /* CBLTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CBLTestCase.swift; sourceTree = "<group>"; };
 		27BE3B4C1E4E51C80012B74A /* DatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseTest.swift; sourceTree = "<group>"; };
@@ -2231,6 +2241,8 @@
 				934F4BEA1E1EF19000F90659 /* MYErrorUtils.m */,
 				934F4BEB1E1EF19000F90659 /* MYLogging.h */,
 				934F4BEC1E1EF19000F90659 /* MYLogging.m */,
+				27BD57AE20D077CC00A48242 /* MYURLUtils.h */,
+				27BD57BF20D077CC00A48242 /* MYURLUtils.m */,
 				934F4C581E1EF25E00F90659 /* Test.h */,
 				934F4C591E1EF25E00F90659 /* Test.m */,
 				934F4C6F1E1EFAF600F90659 /* Test_Assertions.m */,
@@ -2875,6 +2887,7 @@
 				9385F2671FC38F8900032037 /* CBLListenerToken.h in Headers */,
 				93B75C1C1E79EF6F0033B61B /* CBLQueryOrdering.h in Headers */,
 				937F01DB1EFB1A1700060D64 /* CBLBasicAuthenticator.h in Headers */,
+				27BD57C120D077CC00A48242 /* MYURLUtils.h in Headers */,
 				938196091EC111E20032CC51 /* CBLMutableArray.h in Headers */,
 				938196111EC112240032CC51 /* CBLDocument.h in Headers */,
 				93DBD0122004BCE00017CA83 /* CBLURLEndpoint.h in Headers */,
@@ -3016,6 +3029,7 @@
 				9343EFC2207D611600F19A89 /* CBLVersion.h in Headers */,
 				932CC557207D9ED2000B4B78 /* CBLDatabaseEndpoint.h in Headers */,
 				9343EFC3207D611600F19A89 /* CBLMisc.h in Headers */,
+				27BD57C220D077CC00A48242 /* MYURLUtils.h in Headers */,
 				9343EFC4207D611600F19A89 /* CBLBlob+Swift.h in Headers */,
 				9343EFC6207D611600F19A89 /* CBLAuthenticator.h in Headers */,
 				9343EFC7207D611600F19A89 /* CBLPrefix.h in Headers */,
@@ -3130,6 +3144,7 @@
 				9343F0D0207D61AB00F19A89 /* CBLBase64.h in Headers */,
 				9343F0D1207D61AB00F19A89 /* Test.h in Headers */,
 				93E8FEA520A366E50061347F /* CBLMessageEndpoint.h in Headers */,
+				27BD57C320D077CC00A48242 /* MYURLUtils.h in Headers */,
 				9343F0D2207D61AB00F19A89 /* CBLQueryArrayExpression.h in Headers */,
 				9343F0D3207D61AB00F19A89 /* CBLQueryFullTextFunction.h in Headers */,
 				9343F0D4207D61AB00F19A89 /* CBLDictionaryFragment.h in Headers */,
@@ -3350,6 +3365,7 @@
 				934A27AB1F30E641003946A7 /* CBLParameterExpression.h in Headers */,
 				938E389D1F3A7A47006806C7 /* CBLCollationExpression.h in Headers */,
 				934F4C291E1EF19000F90659 /* MYErrorUtils.h in Headers */,
+				27BD57C020D077CC00A48242 /* MYURLUtils.h in Headers */,
 				937A69031F0731230058277F /* CBLQueryFunction.h in Headers */,
 				9381961E1EC11A8C0032CC51 /* CBLDictionary+Swift.h in Headers */,
 				937F026F1EFC694900060D64 /* CBLQueryChange+Internal.h in Headers */,
@@ -4077,6 +4093,7 @@
 				937F02A21EFC7DC600060D64 /* CBLQueryChange.m in Sources */,
 				93E17F0F1ED3BA7500671CA1 /* CBLDatabaseChange.m in Sources */,
 				937441D61E7B8B0500CB8F11 /* CBLPredicateQuery.mm in Sources */,
+				27BD57C520D077CC00A48242 /* MYURLUtils.m in Sources */,
 				93C18E831FB638E80029B567 /* CBLDatabaseConfiguration.m in Sources */,
 				9381961C1EC113860032CC51 /* CBLFragment.m in Sources */,
 				93EC42E91FB3930E00D54BB4 /* CBLQueryArrayExpression.m in Sources */,
@@ -4248,6 +4265,7 @@
 				9343EF4A207D611600F19A89 /* CBLQueryDataSource.m in Sources */,
 				9343EF4B207D611600F19A89 /* CBLHTTPLogic.m in Sources */,
 				9343EF4C207D611600F19A89 /* CBLValueIndex.m in Sources */,
+				27BD57C620D077CC00A48242 /* MYURLUtils.m in Sources */,
 				9343EF4D207D611600F19A89 /* CBLIndex.m in Sources */,
 				9343EF4E207D611600F19A89 /* CBLLiveQuery.mm in Sources */,
 				9343EF4F207D611600F19A89 /* CBLQueryMeta.m in Sources */,
@@ -4432,6 +4450,7 @@
 				932CC55E207D9ED3000B4B78 /* DatabaseEndpoint.swift in Sources */,
 				9343F076207D61AB00F19A89 /* MutableDictionaryObject.swift in Sources */,
 				9343F077207D61AB00F19A89 /* DictionaryObject.swift in Sources */,
+				27BD57C720D077CC00A48242 /* MYURLUtils.m in Sources */,
 				9343F078207D61AB00F19A89 /* CBLDatabase.mm in Sources */,
 				9343F079207D61AB00F19A89 /* CBLDictionary.mm in Sources */,
 				9343F07A207D61AB00F19A89 /* ExceptionUtils.m in Sources */,
@@ -4671,6 +4690,7 @@
 				9374A8A8201FC53600BA0D9E /* CBLReplicator+Backgrounding.m in Sources */,
 				275229C81E776BC100E630FA /* CBLReplicator.mm in Sources */,
 				72A87A061E2E0E70008466FF /* CBLBlobStream.mm in Sources */,
+				27BD57C420D077CC00A48242 /* MYURLUtils.m in Sources */,
 				937A69051F0731230058277F /* CBLQueryFunction.m in Sources */,
 				93DBD0132004BCE00017CA83 /* CBLURLEndpoint.m in Sources */,
 				27D7219B1F8E97F400AA4458 /* CBLFleece.mm in Sources */,
