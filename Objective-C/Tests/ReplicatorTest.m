@@ -200,21 +200,22 @@
 }
 
 
-- (void) run: (CBLReplicatorConfiguration*)config
+- (bool) run: (CBLReplicatorConfiguration*)config
    errorCode: (NSInteger)errorCode
  errorDomain: (NSString*)errorDomain
 {
-    [self run: config reset: NO errorCode: errorCode errorDomain: errorDomain];
+    return [self run: config reset: NO errorCode: errorCode errorDomain: errorDomain];
 }
 
-- (void) run: (CBLReplicatorConfiguration*)config
+- (bool) run: (CBLReplicatorConfiguration*)config
        reset: (BOOL)reset
    errorCode: (NSInteger)errorCode
  errorDomain: (NSString*)errorDomain
 {
     repl = [[CBLReplicator alloc] initWithConfig: config];
     
-    XCTestExpectation* x = [self expectationWithDescription: @"Replicator Change"];
+    XCTestExpectation* x = [self expectationWithDescription: @"Replicator Stopped"];
+    __block bool fulfilled = false;
     __weak typeof(self) wSelf = self;
     id token = [repl addChangeListener: ^(CBLReplicatorChange* change) {
         typeof(self) strongSelf = wSelf;
@@ -225,6 +226,7 @@
         }
         if (change.status.activity == kCBLReplicatorStopped) {
             [x fulfill];
+            fulfilled = true;
         }
     }];
     
@@ -239,6 +241,7 @@
         [repl stop];
         [repl removeChangeListenerWithToken: token];
     }
+    return fulfilled;
 }
 
 
@@ -967,7 +970,8 @@
     
     // Push to SG:
     id config = [self configWithTarget: target type :kCBLReplicatorTypePush continuous: NO];
-    [self run: config errorCode: 0 errorDomain: nil];
+    if (![self run: config errorCode: 0 errorDomain: nil])
+        return;
     
     // Get doc form SG:
     NSDictionary* json = [self sendRequestToEndpoint: target method: @"GET" path: doc1.id body: nil];
