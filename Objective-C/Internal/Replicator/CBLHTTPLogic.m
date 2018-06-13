@@ -28,6 +28,7 @@
 {
     NSMutableURLRequest* _urlRequest;
     NSDictionary* _proxySettings;
+    CBLProxyType _proxyType;
     NSString* _nonceKey;
     NSString* _authorizationHeader;
     CFHTTPMessageRef _responseMsg;
@@ -38,7 +39,7 @@
 
 @synthesize handleRedirects=_handleRedirects, shouldContinue=_shouldContinue;
 @synthesize shouldRetry=_shouldRetry, credential=_credential, httpStatus=_httpStatus, error=_error;
-@synthesize proxySettings=_proxySettings, useProxyCONNECT=_useProxyCONNECT;
+@synthesize proxySettings=_proxySettings, proxyType=_proxyType, useProxyCONNECT=_useProxyCONNECT;
 
 
 static NSDictionary* sOverrideProxySettings;
@@ -50,7 +51,7 @@ static NSDictionary* sOverrideProxySettings;
     if (self) {
         _urlRequest = [urlRequest mutableCopy];
         _handleRedirects = YES;
-        _proxySettings = sOverrideProxySettings ?: urlRequest.URL.my_proxySettings;
+        [self lookupProxySettings];
     }
     return self;
 }
@@ -71,48 +72,78 @@ static NSDictionary* sOverrideProxySettings;
 }
 
 
-- (BOOL) usingHTTPProxy {
-    NSString* type = _proxySettings[(id)kCFProxyTypeKey];
-    return [type isEqualToString: (id)kCFProxyTypeHTTP]
-        || [type isEqualToString: (id)kCFProxyTypeHTTPS];
+- (void) lookupProxySettings {
+    self.proxySettings = sOverrideProxySettings ?: _urlRequest.URL.my_proxySettings;
+}
+
+
+- (void) setProxySettings: (NSDictionary*)settings {
+    NSString* type = settings[(id)kCFProxyTypeKey];
+    if ([type isEqualToString: (id)kCFProxyTypeHTTP]
+                || [type isEqualToString: (id)kCFProxyTypeHTTPS])
+        _proxyType = kCBLHTTPProxy;
+    else if ([type isEqualToString: (id)kCFProxyTypeSOCKS])
+        _proxyType = kCBLSOCKSProxy;
+    else {
+        _proxyType = kCBLNoProxy;
+        settings = nil;
+    }
+    _proxySettings = [settings copy];
+}
+
+
+- (BOOL) setProxyURL: (NSURL*)proxyURL {
+    NSString* host = proxyURL.host;
+    if ([proxyURL.scheme.lowercaseString hasPrefix: @"http"] && host) {
+        id type = proxyURL.my_isHTTPS ? (id)kCFProxyTypeHTTPS : (id)kCFProxyTypeHTTP;
+        self.proxySettings = @{(id)kCFProxyTypeKey:       type,
+                               (id)kCFProxyHostNameKey:   host,
+                               (id)kCFProxyPortNumberKey: @(proxyURL.my_effectivePort)};
+        return true;
+    } else {
+        self.proxySettings = nil;
+        return (proxyURL == nil);
+    }
 }
 
 
 - (NSString*) directHost {
-    if (self.usingHTTPProxy) {
-        NSString* host = _proxySettings[(id)kCFProxyHostNameKey];
-        if (host)
-            return host;
-    }
-    return self.URL.host;
+    if (_proxyType == kCBLNoProxy)
+        return self.URL.host;
+    else
+        return _proxySettings[(id)kCFProxyHostNameKey];
 }
 
 
 - (UInt16) directPort {
-    if (self.usingHTTPProxy) {
-        NSNumber* port = _proxySettings[(id)kCFProxyPortNumberKey];
-        return port ? port.unsignedShortValue : 80;
-    }
-    return self.port;
+    if (_proxyType == kCBLNoProxy)
+        return self.port;
+    NSNumber* portObj = _proxySettings[(id)kCFProxyPortNumberKey];
+    if (portObj)
+        return portObj.unsignedShortValue;
+    else if ([_proxySettings[(id)kCFProxyTypeKey] isEqualToString: (id)kCFProxyTypeHTTPS])
+        return 443;
+    else
+        return 80;
 }
 
 
 - (UInt16) port {
-    NSNumber* portObj = self.URL.port;
-    if (portObj)
-        return (UInt16)portObj.intValue;
-    else
-        return self.useTLS ? 443 : 80;
+    return self.URL.my_effectivePort;
 }
 
+
 - (BOOL) useTLS {
-    if (self.usingHTTPProxy) {
-        return [_proxySettings[(id)kCFProxyTypeKey] isEqualToString: (id)kCFProxyTypeHTTPS]
-            || self.directPort == 443;
-    } else {
-        NSString* scheme = self.URL.scheme.lowercaseString;
-        return [scheme isEqualToString: @"https"] || [scheme isEqualToString: @"wss"]
-                                                  || [scheme isEqualToString: @"blips"];
+    switch (_proxyType) {
+        case kCBLNoProxy: {
+            NSString* scheme = self.URL.scheme.lowercaseString;
+            return [scheme isEqualToString: @"https"] || [scheme isEqualToString: @"wss"];
+        }
+        case kCBLHTTPProxy:
+            return [_proxySettings[(id)kCFProxyTypeKey] isEqualToString: (id)kCFProxyTypeHTTPS]
+                    || self.directPort == 443;
+        case kCBLSOCKSProxy:
+            return NO;
     }
 }
 
@@ -169,7 +200,7 @@ static NSDictionary* sOverrideProxySettings;
 
     // Create the CFHTTPMessage:
     CFHTTPMessageRef httpMsg;
-    if (_useProxyCONNECT && self.usingHTTPProxy) {
+    if (_proxyType == kCBLHTTPProxy && _useProxyCONNECT) {
         NSURL *requestURL = [NSURL URLWithString: $sprintf(@"%@:%d", url.host, url.my_effectivePort)];
         httpMsg = CFHTTPMessageCreateRequest(NULL,
                                              CFSTR("CONNECT"),
@@ -257,7 +288,7 @@ static NSDictionary* sOverrideProxySettings;
     NSData* data = CFBridgingRelease(CFHTTPMessageCopySerializedMessage(rq));
     CFRelease(rq);
 
-    if (self.usingHTTPProxy && !_useProxyCONNECT) {
+    if (_proxyType == kCBLHTTPProxy && !_useProxyCONNECT) {
         // CFHTTPMessage doesn't know how to create a proxy form of a request, where the request
         // line contains the entire URL. So splice in the scheme/host/port in front of the path:
         NSMutableData* mdata = [data mutableCopy];
@@ -289,6 +320,7 @@ static NSDictionary* sOverrideProxySettings;
     switch (_httpStatus) {
         case 301:
         case 302:
+        case 305:
         case 307: {
             // Redirect:
             if (!_handleRedirects)
@@ -363,7 +395,12 @@ static NSDictionary* sOverrideProxySettings;
     if ([url.scheme caseInsensitiveCompare: @"http"] != 0 &&
             [url.scheme caseInsensitiveCompare: @"https"] != 0)
         return NO;
-    _urlRequest.URL = url;
+    if (_httpStatus == 305) {
+        return _proxyType == kCBLNoProxy && [self setProxyURL: url];
+    } else {
+        _urlRequest.URL = url;
+        [self lookupProxySettings];
+    }
     return YES;
 }
 

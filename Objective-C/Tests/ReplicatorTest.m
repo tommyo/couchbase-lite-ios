@@ -93,10 +93,18 @@
     Assert(url);
 
     NSString* proxy = NSProcessInfo.processInfo.environment[@"CBL_TEST_PROXY_HOST"];
+    NSString* proxyType = NSProcessInfo.processInfo.environment[@"CBL_TEST_PROXY_TYPE"];
     int proxyPort = [NSProcessInfo.processInfo.environment[@"CBL_TEST_PROXY_PORT"] intValue] ?: 80;
     if (proxy) {
-        Log(@"Using proxy server %@:%d", proxy, proxyPort);
-        [CBLHTTPLogic setOverrideProxySettings: @{(id)kCFProxyTypeKey: (id)kCFProxyTypeHTTP,
+        proxyType = [(proxyType ?: @"http") uppercaseString];
+        Log(@"Using %@ proxy server %@:%d", proxyType, proxy, proxyPort);
+        if ([proxyType isEqualToString: @"HTTP"])
+            proxyType = (id)kCFProxyTypeHTTP;
+        else if ([proxyType isEqualToString: @"HTTPS"])
+            proxyType = (id)kCFProxyTypeHTTPS;
+        else if ([proxyType isEqualToString: @"SOCKS"])
+            proxyType = (id)kCFProxyTypeSOCKS;
+        [CBLHTTPLogic setOverrideProxySettings: @{(id)kCFProxyTypeKey: proxyType,
                                                   (id)kCFProxyHostNameKey: proxy,
                                                   (id)kCFProxyPortNumberKey: @(proxyPort)}];
     }
