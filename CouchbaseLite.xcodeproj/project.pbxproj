@@ -1272,6 +1272,13 @@
 			remoteGlobalIDString = 275F92731E4D30A4007FD5A2;
 			remoteInfo = "CBL Swift";
 		};
+		27C4D07D212B896300470DE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27C4D077212B896300470DE9 /* Micro.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 277A064A20ACCB7C00970354;
+			remoteInfo = Micro;
+		};
 		27DF7D831F424C840022F3DF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9398D9311E0347B600464432 /* LiteCore.xcodeproj */;
@@ -1534,6 +1541,7 @@
 		27BE3B4E1E4E65EB0012B74A /* DocumentTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentTest.swift; sourceTree = "<group>"; };
 		27BE3B531E4E92210012B74A /* Database+Query.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Database+Query.swift"; sourceTree = "<group>"; };
 		27BE3B551E4E93000012B74A /* PredicateQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PredicateQuery.swift; sourceTree = "<group>"; };
+		27C4D077212B896300470DE9 /* Micro.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Micro.xcodeproj; path = Micro/Xcode/Micro.xcodeproj; sourceTree = "<group>"; };
 		27CDE75E207407280082D458 /* CBLDocumentChangeNotifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLDocumentChangeNotifier.h; sourceTree = "<group>"; };
 		27CDE75F207407280082D458 /* CBLDocumentChangeNotifier.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLDocumentChangeNotifier.mm; sourceTree = "<group>"; };
 		27D721971F8E97F400AA4458 /* CBLFleece.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLFleece.hh; sourceTree = "<group>"; };
@@ -2086,6 +2094,14 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		27C4D078212B896300470DE9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				27C4D07E212B896300470DE9 /* Micro */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		27D7ECFC1F2A851600828ECF /* Authenticators */ = {
 			isa = PBXGroup;
 			children = (
@@ -2592,6 +2608,7 @@
 			isa = PBXGroup;
 			children = (
 				9398D9311E0347B600464432 /* LiteCore.xcodeproj */,
+				27C4D077212B896300470DE9 /* Micro.xcodeproj */,
 				934F4BCD1E1EF19000F90659 /* MYUtilities */,
 			);
 			path = vendor;
@@ -3745,6 +3762,10 @@
 					ProductGroup = 9398D9321E0347B600464432 /* Products */;
 					ProjectRef = 9398D9311E0347B600464432 /* LiteCore.xcodeproj */;
 				},
+				{
+					ProductGroup = 27C4D078212B896300470DE9 /* Products */;
+					ProjectRef = 27C4D077212B896300470DE9 /* Micro.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -3801,6 +3822,13 @@
 			fileType = wrapper.application;
 			path = "LiteCoreServ-iOS.app";
 			remoteRef = 276740CC1EE7381F0036DE42 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		27C4D07E212B896300470DE9 /* Micro */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Micro;
+			remoteRef = 27C4D07D212B896300470DE9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		27DF7D841F424C840022F3DF /* libSQLite.a */ = {
