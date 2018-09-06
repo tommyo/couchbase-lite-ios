@@ -23,6 +23,10 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		2700313D2141CE2500813B3B /* libLiteMicroBridge.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2700313C2141CE1900813B3B /* libLiteMicroBridge.a */; };
+		2700313F2141D02700813B3B /* MicroSyncTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2700313E2141D02700813B3B /* MicroSyncTest.m */; };
+		270031422141D1FD00813B3B /* CBLDatabase+Micro.h in Headers */ = {isa = PBXBuildFile; fileRef = 270031402141D1FD00813B3B /* CBLDatabase+Micro.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		270031432141D1FD00813B3B /* CBLDatabase+Micro.mm in Sources */ = {isa = PBXBuildFile; fileRef = 270031412141D1FD00813B3B /* CBLDatabase+Micro.mm */; };
 		270AB2BC2073EF57009A4596 /* CBLChangeNotifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 270AB2BA2073EF57009A4596 /* CBLChangeNotifier.h */; };
 		270AB2BD2073EF57009A4596 /* CBLChangeNotifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 270AB2BA2073EF57009A4596 /* CBLChangeNotifier.h */; };
 		270AB2BE2073EF57009A4596 /* CBLChangeNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 270AB2BB2073EF57009A4596 /* CBLChangeNotifier.m */; };
@@ -1202,6 +1206,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		270031242141CE1900813B3B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27C4D077212B896300470DE9 /* Micro.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 27C4D093212B93E400470DE9;
+			remoteInfo = LiteMicroBridge;
+		};
+		270031392141CE1900813B3B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27C4D077212B896300470DE9 /* Micro.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27744AF6213F14D600399DCA;
+			remoteInfo = Micro;
+		};
+		2700313B2141CE1900813B3B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27C4D077212B896300470DE9 /* Micro.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27C4D094212B93E400470DE9;
+			remoteInfo = LiteMicroBridge;
+		};
 		273E555B1F79AF5E000182F1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9398D9311E0347B600464432 /* LiteCore.xcodeproj */;
@@ -1493,6 +1518,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2700313E2141D02700813B3B /* MicroSyncTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MicroSyncTest.m; sourceTree = "<group>"; };
+		270031402141D1FD00813B3B /* CBLDatabase+Micro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CBLDatabase+Micro.h"; sourceTree = "<group>"; };
+		270031412141D1FD00813B3B /* CBLDatabase+Micro.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Micro.mm"; sourceTree = "<group>"; };
 		270AB2BA2073EF57009A4596 /* CBLChangeNotifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLChangeNotifier.h; sourceTree = "<group>"; };
 		270AB2BB2073EF57009A4596 /* CBLChangeNotifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBLChangeNotifier.m; sourceTree = "<group>"; };
 		2728509C1E99CA4D009CA22F /* CBLReplicator+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CBLReplicator+Internal.h"; path = "../CBLReplicator+Internal.h"; sourceTree = "<group>"; };
@@ -2004,6 +2032,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2700313D2141CE2500813B3B /* libLiteMicroBridge.a in Frameworks */,
 				9399E4B31E932F4700B57600 /* libz.tbd in Frameworks */,
 				9399E4B01E932EF200B57600 /* libLiteCore-static.a in Frameworks */,
 			);
@@ -2097,7 +2126,9 @@
 		27C4D078212B896300470DE9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				27C4D07E212B896300470DE9 /* Micro */,
+				2700313A2141CE1900813B3B /* libMicro.a */,
+				27C4D07E212B896300470DE9 /* RunMicro */,
+				2700313C2141CE1900813B3B /* libLiteMicroBridge.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2199,6 +2230,8 @@
 			children = (
 				93BFCD9E1E0385EA00E52F8A /* CBLDatabase.h */,
 				93BFCD9F1E0385EA00E52F8A /* CBLDatabase.mm */,
+				270031402141D1FD00813B3B /* CBLDatabase+Micro.h */,
+				270031412141D1FD00813B3B /* CBLDatabase+Micro.mm */,
 				93E17F091ED3AC8100671CA1 /* CBLDatabaseChange.h */,
 				93E17F0A1ED3AC8100671CA1 /* CBLDatabaseChange.m */,
 				93C18E7E1FB638E80029B567 /* CBLDatabaseConfiguration.h */,
@@ -2697,6 +2730,7 @@
 				93DECF3E200DBE5800F44953 /* Support */,
 				936483AA1E4431C6008D08B3 /* iOS */,
 				275FF5FA1E3FBD3B005F90DD /* Performance */,
+				2700313E2141D02700813B3B /* MicroSyncTest.m */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -3399,6 +3433,7 @@
 				93FD618B2020757500E7F6A1 /* CBLIndex.h in Headers */,
 				930AE46D1EAA6C9100E92E9A /* CBLData.h in Headers */,
 				939B1B2C200990FB00FAA3CB /* CBLValueExpression.h in Headers */,
+				270031422141D1FD00813B3B /* CBLDatabase+Micro.h in Headers */,
 				934F4CB41E241FB500F90659 /* CBLParseDate.h in Headers */,
 				93B41CC91F04730500A7F114 /* CBLReplicatorChange+Internal.h in Headers */,
 				934A27AB1F30E641003946A7 /* CBLParameterExpression.h in Headers */,
@@ -3654,6 +3689,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				270031252141CE1900813B3B /* PBXTargetDependency */,
 				9399E4AF1E932EE800B57600 /* PBXTargetDependency */,
 			);
 			name = "CBL ObjC";
@@ -3789,6 +3825,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		2700313A2141CE1900813B3B /* libMicro.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libMicro.a;
+			remoteRef = 270031392141CE1900813B3B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2700313C2141CE1900813B3B /* libLiteMicroBridge.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libLiteMicroBridge.a;
+			remoteRef = 2700313B2141CE1900813B3B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		273E555C1F79AF5E000182F1 /* cblite */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -3824,10 +3874,10 @@
 			remoteRef = 276740CC1EE7381F0036DE42 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		27C4D07E212B896300470DE9 /* Micro */ = {
+		27C4D07E212B896300470DE9 /* RunMicro */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			path = Micro;
+			path = RunMicro;
 			remoteRef = 27C4D07D212B896300470DE9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -4729,6 +4779,7 @@
 				9383A5801F1EE7860083053D /* CBLQueryRowsArray.mm in Sources */,
 				938E389F1F3A7A47006806C7 /* CBLCollationExpression.m in Sources */,
 				933208131E77415E000D9993 /* CBLQueryDataSource.m in Sources */,
+				270031432141D1FD00813B3B /* CBLDatabase+Micro.mm in Sources */,
 				2753AFF71EC39CA200C12E98 /* CBLHTTPLogic.m in Sources */,
 				93EC42D31FB3801E00D54BB4 /* CBLValueIndex.m in Sources */,
 				93FD618D2020757500E7F6A1 /* CBLIndex.m in Sources */,
@@ -4813,6 +4864,7 @@
 				9385F3031FC645AE00032037 /* ConcurrentTest.m in Sources */,
 				27E35A821E8B3B3A00E103F9 /* ReplicatorTest.m in Sources */,
 				93DD9BA81EB419BB00E502A2 /* ArrayTest.m in Sources */,
+				2700313F2141D02700813B3B /* MicroSyncTest.m in Sources */,
 				931C146A1EAAF08C0094F9B2 /* FragmentTest.m in Sources */,
 				9332082C1E774419000D9993 /* QueryTest.m in Sources */,
 			);
@@ -4821,6 +4873,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		270031252141CE1900813B3B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LiteMicroBridge;
+			targetProxy = 270031242141CE1900813B3B /* PBXContainerItemProxy */;
+		};
 		275F927F1E4D30A4007FD5A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 275F92731E4D30A4007FD5A2 /* CBL Swift */;
