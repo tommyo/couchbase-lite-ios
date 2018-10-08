@@ -1954,11 +1954,11 @@ static CBLManager* sCBLManager;
 #pragma mark - Cache
 
 - (NSData*) SHA1: (NSData*)input {
-    unsigned char digest[SHA_DIGEST_LENGTH];
-    SHA_CTX ctx;
-    SHA1_Init(&ctx);
-    SHA1_Update(&ctx, input.bytes, input.length);
-    SHA1_Final(digest, &ctx);
+    unsigned char digest[CC_SHA1_DIGEST_LENGTH];
+    CC_SHA1_CTX ctx;
+    CC_SHA1_Init(&ctx);
+    CC_SHA1_Update(&ctx, input.bytes, (CC_LONG)input.length);
+    CC_SHA1_Final(digest, &ctx);
     return [NSData dataWithBytes: &digest length: sizeof(digest)];
 }
 
