@@ -258,6 +258,12 @@ BOOL CBLQueryRowValueIsEntireDoc(id value) {
 - (id) value1                         {return [self valueAtIndex: 1];}
 - (id) value2                         {return [self valueAtIndex: 2];}
 - (id) value3                         {return [self valueAtIndex: 3];}
+- (id) value4                         {return [self valueAtIndex: 4];}
+- (id) value5                         {return [self valueAtIndex: 5];}
+- (id) value6                         {return [self valueAtIndex: 6];}
+- (id) value7                         {return [self valueAtIndex: 7];}
+- (id) value8                         {return [self valueAtIndex: 8];}
+- (id) value9                         {return [self valueAtIndex: 9];}
 
 
 - (CBLDocument*) document {

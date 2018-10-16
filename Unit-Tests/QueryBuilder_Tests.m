@@ -736,4 +736,49 @@ query.descending = YES;\n");
     AssertEqual(resultID, limitedResultID);
 }
 
+// https://github.com/couchbase/couchbase-lite-ios/issues/2218
+- (void) test16_ManyReferencingToValues {
+    NSDictionary* properties = @{@"type": @"task",
+                                 @"subtype": @"performance",
+                                 @"equipment": @"e1",
+                                 @"operator": @"op1",
+                                 @"department": @"eng",
+                                 @"level": @(5),
+                                 @"proprity": @(2),
+                                 @"status": @"3",
+                                 @"createdAt": @"2018-10-16T22:00:00.000Z"
+                                 };
+    [self createDocumentWithProperties: properties];
+    
+    NSString* pred = @"type == 'task' AND subtype == $subtype AND "
+                     @"equipment == $equipment AND operator == $operator AND "
+                     @"level > $startLevel AND level < $endLevel AND "
+                     @"department == $department AND priority != $priority AND "
+                     @"status != $status";
+    NSArray* order = @[@"createdAt"];
+    
+    NSError *error = nil;
+    CBLQueryBuilder* b = [[CBLQueryBuilder alloc] initWithDatabase: db
+                                                            select: nil
+                                                             where: pred
+                                                           orderBy: order
+                                                             error: &error];
+    Log(@"%@", b.explanation);
+    
+    NSDictionary* context = @{@"subtype": @"performance",
+                              @"equipment": @"e1",
+                              @"operator": @"op1",
+                              @"startLevel":@1,
+                              @"endLevel": @10,
+                              @"department": @"eng",
+                              @"priority": @1,
+                              @"status": @1
+                              };
+    CBLQuery* query = [b createQueryWithContext: context];
+    CBLQueryEnumerator *e = [query run:&error];
+    Assert(e, @"Query failed: %@", error);
+    NSArray* rows = e.allObjects;
+    Assert(rows.count == 1);
+}
+
 @end
