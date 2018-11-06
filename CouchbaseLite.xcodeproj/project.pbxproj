@@ -33,6 +33,10 @@
 		273E555E1F79AF79000182F1 /* MiscTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 93384F8B1EB151C100976B41 /* MiscTest.m */; };
 		2747666420191BFA007B39D1 /* CBLErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 27476651201912B5007B39D1 /* CBLErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27476665201946A3007B39D1 /* CBLErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 27476651201912B5007B39D1 /* CBLErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		274D17D021920529007FD01A /* CBLTokenizer.hh in Headers */ = {isa = PBXBuildFile; fileRef = 274D17CE21920529007FD01A /* CBLTokenizer.hh */; };
+		274D17D121920529007FD01A /* CBLTokenizer.hh in Headers */ = {isa = PBXBuildFile; fileRef = 274D17CE21920529007FD01A /* CBLTokenizer.hh */; };
+		274D17D221920529007FD01A /* CBLTokenizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 274D17CF21920529007FD01A /* CBLTokenizer.mm */; };
+		274D17D321920529007FD01A /* CBLTokenizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 274D17CF21920529007FD01A /* CBLTokenizer.mm */; };
 		275229C71E776BC100E630FA /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 275229C51E776BC100E630FA /* CBLReplicator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		275229C81E776BC100E630FA /* CBLReplicator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275229C61E776BC100E630FA /* CBLReplicator.mm */; };
 		2753AFF51EC39CA200C12E98 /* CBLHTTPLogic.h in Headers */ = {isa = PBXBuildFile; fileRef = 2753AFF11EC39CA200C12E98 /* CBLHTTPLogic.h */; };
@@ -1490,6 +1494,8 @@
 		270AB2BB2073EF57009A4596 /* CBLChangeNotifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBLChangeNotifier.m; sourceTree = "<group>"; };
 		2728509C1E99CA4D009CA22F /* CBLReplicator+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CBLReplicator+Internal.h"; path = "../CBLReplicator+Internal.h"; sourceTree = "<group>"; };
 		27476651201912B5007B39D1 /* CBLErrors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLErrors.h; sourceTree = "<group>"; };
+		274D17CE21920529007FD01A /* CBLTokenizer.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTokenizer.hh; sourceTree = "<group>"; };
+		274D17CF21920529007FD01A /* CBLTokenizer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLTokenizer.mm; sourceTree = "<group>"; };
 		274D6C272011529D00DAB7DD /* CBLLog+Admin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CBLLog+Admin.h"; sourceTree = "<group>"; };
 		275229C51E776BC100E630FA /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
 		275229C61E776BC100E630FA /* CBLReplicator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLReplicator.mm; sourceTree = "<group>"; };
@@ -2653,6 +2659,8 @@
 				938B36A3200745FE004485D8 /* CBLQueryResultArray.m */,
 				9383A5941F1EEFCD0083053D /* CBLQueryResult+Internal.h */,
 				9383A58E1F1EE9550083053D /* CBLQueryResultSet+Internal.h */,
+				274D17CE21920529007FD01A /* CBLTokenizer.hh */,
+				274D17CF21920529007FD01A /* CBLTokenizer.mm */,
 			);
 			name = Query;
 			sourceTree = "<group>";
@@ -2865,6 +2873,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				274D17D121920529007FD01A /* CBLTokenizer.hh in Headers */,
 				938B36A5200745FF004485D8 /* CBLQueryResultArray.h in Headers */,
 				27F9619A1ED8D9440060F804 /* CBLReachability.h in Headers */,
 				9383A5961F1EEFCD0083053D /* CBLQueryResult+Internal.h in Headers */,
@@ -3391,6 +3400,7 @@
 				937A69031F0731230058277F /* CBLQueryFunction.h in Headers */,
 				9381961E1EC11A8C0032CC51 /* CBLDictionary+Swift.h in Headers */,
 				937F026F1EFC694900060D64 /* CBLQueryChange+Internal.h in Headers */,
+				274D17D021920529007FD01A /* CBLTokenizer.hh in Headers */,
 				933208121E77415E000D9993 /* CBLQueryDataSource.h in Headers */,
 				931C14531EAABCE70094F9B2 /* CBLFragment.h in Headers */,
 				938196211EC11CDF0032CC51 /* CBLArray+Swift.h in Headers */,
@@ -4126,6 +4136,7 @@
 				938196181EC113730032CC51 /* CBLMutableFragment.m in Sources */,
 				9381960E1EC112170032CC51 /* CBLArray.mm in Sources */,
 				938CDF271E807F8F002EE790 /* WhereRouter.swift in Sources */,
+				274D17D321920529007FD01A /* CBLTokenizer.mm in Sources */,
 				939B1B2F200990FB00FAA3CB /* CBLValueExpression.m in Sources */,
 				93EC42F41FB3AE6400D54BB4 /* PropertyExpression.swift in Sources */,
 				270AB2BF2073EF57009A4596 /* CBLChangeNotifier.m in Sources */,
@@ -4728,6 +4739,7 @@
 				934F4CB71E241FB500F90659 /* CBLStringBytes.mm in Sources */,
 				9374A89D201FC47E00BA0D9E /* MYBackgroundMonitor.m in Sources */,
 				93EC42DC1FB384D200D54BB4 /* CBLFunctionExpression.m in Sources */,
+				274D17D221920529007FD01A /* CBLTokenizer.mm in Sources */,
 				93B41D661F0580E700A7F114 /* CBLQueryJoin.m in Sources */,
 				93CD024C1E9DA0AC00AFB3FA /* CBLC4Document.mm in Sources */,
 				934A27A11F30E61B003946A7 /* CBLPropertyExpression.m in Sources */,

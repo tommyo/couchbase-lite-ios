@@ -251,7 +251,9 @@
     [self loadJSONResource: @"sentences"];
     NSError* error;
     
-    CBLIndex* index = [CBLIndexBuilder fullTextIndexWithItems: @[[CBLFullTextIndexItem property: @"sentence"]]];
+    CBLFullTextIndex* index = [CBLIndexBuilder fullTextIndexWithItems: @[[CBLFullTextIndexItem property: @"sentence"]]];
+    //index.language = nil;
+    //index.ignoreAccents = YES;
     Assert([_db createIndex: index withName: @"sentence" error: &error]);
     
     CBLPredicateQuery *q = [self.db createQueryWhere: @"sentence matches 'Dummie woman'"];

@@ -33,6 +33,7 @@
 #import "CBLStatus.h"
 #import "CBLLog+Admin.h"
 #import "CBLVersion.h"
+#import "CBLTokenizer.hh"
 #import "fleece/Fleece.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
@@ -80,6 +81,7 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     if (self == [CBLDatabase class]) {
         NSLog(@"%@", [CBLVersion userAgent]);
         CBLLog_Init();
+        InstallCBLTokenizer();
     }
 }
 
