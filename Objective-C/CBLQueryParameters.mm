@@ -19,6 +19,8 @@
 
 #import "CBLQueryParameters.h"
 #import "CBLQuery+Internal.h"
+#import "CBLStatus.h"
+#import "fleece/Fleece.hh"
 
 
 @interface CBLQueryParameters()
@@ -130,11 +132,19 @@
 }
 
 
-- (nullable NSData*) encodeAsJSON: (NSError**)outError {
-    if (_data)
-        return [NSJSONSerialization dataWithJSONObject: _data options: 0 error: outError];
-    else
+- (nullable NSData*) encodeAsBinary: (NSError**)outError {
+    fleece::Encoder enc;
+    if (_data) {
+        enc.writeNSObject(_data);
+    } else {
+        enc.beginDict();
+        enc.endDict();
+    }
+    if (enc.error()) {
+        convertError(enc.error(), outError);
         return nil;
+    }
+    return enc.finish().uncopiedNSData();
 }
 
 @end

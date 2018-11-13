@@ -120,9 +120,12 @@
         return nil;
     
     C4QueryOptions options = kC4DefaultQueryOptions;
-    NSData* paramJSON = [_parameters encodeAsJSON: outError];
-    if (_parameters && !paramJSON)
-        return nil;
+    NSData* paramJSON;
+    if (_parameters) {
+        paramJSON = [_parameters encodeAsBinary: outError];
+        if (!paramJSON)
+            return nil;
+    }
     
     C4Error c4Err;
     C4QueryEnumerator* e;
