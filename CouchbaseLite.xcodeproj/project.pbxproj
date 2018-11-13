@@ -57,7 +57,7 @@
 		275FF6291E3FECD2005F90DD /* TunesPerfTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275FF60B1E3FCA20005F90DD /* TunesPerfTest.mm */; };
 		275FF6391E3FFBC0005F90DD /* PerfTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275FF6381E3FFBC0005F90DD /* PerfTest.mm */; };
 		275FF6591E412C66005F90DD /* DocPerfTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 275FF6581E412C66005F90DD /* DocPerfTest.m */; };
-		275FF6701E43E013005F90DD /* CBLQueryRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FF66E1E43E013005F90DD /* CBLQueryRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		275FF6701E43E013005F90DD /* CBLQueryRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FF66E1E43E013005F90DD /* CBLQueryRow.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		275FF6711E43E013005F90DD /* CBLQueryRow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275FF66F1E43E013005F90DD /* CBLQueryRow.mm */; };
 		275FF6B81E47B2FC005F90DD /* ExceptionUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FF6B61E47B2FC005F90DD /* ExceptionUtils.h */; };
 		275FF6B91E47B2FC005F90DD /* ExceptionUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 275FF6B71E47B2FC005F90DD /* ExceptionUtils.m */; };
@@ -327,7 +327,7 @@
 		9343EFB0207D611600F19A89 /* CBLMutableDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 9380C6ED1E15B8C20011E8CB /* CBLMutableDocument.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9343EFB1207D611600F19A89 /* CBLReplicator+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 2728509C1E99CA4D009CA22F /* CBLReplicator+Internal.h */; };
 		9343EFB2207D611600F19A89 /* CBLHTTPLogic.h in Headers */ = {isa = PBXBuildFile; fileRef = 2753AFF11EC39CA200C12E98 /* CBLHTTPLogic.h */; };
-		9343EFB3207D611600F19A89 /* CBLQueryRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FF66E1E43E013005F90DD /* CBLQueryRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9343EFB3207D611600F19A89 /* CBLQueryRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FF66E1E43E013005F90DD /* CBLQueryRow.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9343EFB4207D611600F19A89 /* CBLQueryVariableExpression+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 939B1B5E2009C0F200FAA3CB /* CBLQueryVariableExpression+Internal.h */; };
 		9343EFB5207D611600F19A89 /* CBLException.h in Headers */ = {isa = PBXBuildFile; fileRef = 93B72062205CA6650069F5FC /* CBLException.h */; };
 		9343EFB6207D611600F19A89 /* CBLBase64.h in Headers */ = {isa = PBXBuildFile; fileRef = 934F4C941E241FB500F90659 /* CBLBase64.h */; };
