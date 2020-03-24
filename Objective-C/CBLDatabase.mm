@@ -62,14 +62,19 @@ using namespace fleece;
     
     BOOL _shellMode;
     dispatch_source_t _docExpiryTimer;
+    
+    NSMutableSet<CBLReplicator*>* _activeReplicators;
+    NSMutableSet<CBLLiveQuery*>* _activeLiveQueries;
+    
+    BOOL _isClosing;
+    NSCondition* _closeCondition;
+    DatabaseCompletion _pendingCloseCompletion;
 }
 
 @synthesize name=_name;
 @synthesize dispatchQueue=_dispatchQueue;
 @synthesize queryQueue=_queryQueue;
 @synthesize c4db=_c4db, sharedKeys=_sharedKeys;
-@synthesize replications=_replications, activeReplications=_activeReplications;
-@synthesize liveQueries= _liveQueries;
 
 static const C4DatabaseConfig kDBConfig = {
     .flags = (kC4DB_Create | kC4DB_AutoCompact | kC4DB_SharedKeys),
@@ -117,10 +122,6 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
         
         qName = $sprintf(@"Database-Query <%@>", name);
         _queryQueue = dispatch_queue_create(qName.UTF8String, DISPATCH_QUEUE_SERIAL);
-        
-        _replications = [NSMapTable strongToWeakObjectsMapTable];
-        _activeReplications = [NSMutableSet new];
-        _liveQueries = [NSMutableSet new];
     }
     return self;
 }
@@ -146,7 +147,7 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
 - (void) dealloc {
     if (!_shellMode) {
         [self freeC4Observer];
-        [self freeC4DB];
+        c4db_release(_c4db);
     }
 }
 
@@ -360,56 +361,101 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
 #pragma mark - DATABASE MAINTENANCE
 
 - (BOOL) close: (NSError**)outError {
+    NSArray *activeReplicators, *activeLiveQueries = nil;
+    
     CBL_LOCK(self) {
-        if (_c4db == nullptr)
+        if (_isClosing || [self isClosed]) {
             return YES;
+        }
         
         CBLLogInfo(Database, @"Closing %@ at path %@", self, self.path);
-    
-        if (_activeReplications.count > 0) {
-            return createError(CBLErrorBusy, kCBLErrorMessageCloseDBFailedReplications, outError);
-        }
         
-        if (_liveQueries.count > 0) {
-            return createError(CBLErrorBusy, kCBLErrorMessageCloseDBFailedQueryListeners, outError);
-        }
+        // Set closing flag:
+        _isClosing = true;
         
         [self cancelDocExpiryTimer];
-    
-        C4Error err;
-        if (!c4db_close(_c4db, &err))
-            return convertError(err, outError);
-    
         [self freeC4Observer];
-        [self freeC4DB];
+        
+        activeReplicators = [_activeReplicators allObjects];
+        activeLiveQueries = [_activeLiveQueries allObjects];
+        
+        if (!_closeCondition)
+            _closeCondition = [[NSCondition alloc] init];
+    }
     
-        return YES;
+    // Stop active replicators:
+    for (CBLReplicator* r in activeReplicators) {
+        [r stop];
+    }
+    
+    // Stop active live queries:
+    for (CBLLiveQuery* q in activeLiveQueries) {
+        [q stop];
+    }
+    
+    // Wait for all active replicators and live quries to be stopped:
+    [_closeCondition lock];
+    while ([self isReadyToClose]) {
+        [_closeCondition wait];
+    }
+    [_closeCondition unlock];
+    
+    CBL_LOCK(self) {
+        // Close database:
+        BOOL success = YES;
+        C4Error err;
+        if (!c4db_close(_c4db, &err)) {
+            success = convertError(err, outError);
+        }
+        
+        // Release database:
+        if (success) {
+            c4db_release(_c4db);
+            _c4db = nil;
+        }
+        
+        // Reset closing flag:
+        _isClosing = false;
+        
+        return success;
+    }
+}
+
+- (BOOL) isReadyToClose {
+    CBL_LOCK(self) {
+        return _activeReplicators.count > 0 || _activeLiveQueries.count > 0;
+    }
+}
+
+- (void) checkPendingDatabaseClose {
+    CBL_LOCK(self) {
+        if (!_pendingCloseCompletion)
+            return;
+        
+        NSError* error = nil;
+        BOOL success = [self close: &error];
+        if (!success && error.code == CBLErrorBusy)
+            return;
+        
+        DatabaseCompletion completion = _pendingCloseCompletion;
+        _pendingCloseCompletion = nil;
+        dispatch_async(_dispatchQueue, ^{
+            completion(success, error);
+        });
     }
 }
 
 - (BOOL) delete: (NSError**)outError {
     CBL_LOCK(self) {
         [self mustBeOpen];
-        
-        if (_activeReplications.count > 0) {
-            return createError(CBLErrorBusy, kCBLErrorMessageDeleteDBFailedReplications, outError);
-        }
-        
-        if (_liveQueries.count > 0) {
-            return createError(CBLErrorBusy, kCBLErrorMessageDeleteDBFailedQueryListeners, outError);
-        }
-        
-        [self cancelDocExpiryTimer];
-        
-        C4Error err;
-        if (!c4db_delete(_c4db, &err))
-            return convertError(err, outError);
-        
-        [self freeC4Observer];
-        [self freeC4DB];
-        
-        return YES;
     }
+    
+    if (![self close: outError])
+        return false;
+    
+    return [self.class deleteDatabase: self.name
+                          inDirectory: self.config.directory
+                                error: outError];
 }
 
 - (BOOL) compact: (NSError**)outError {
@@ -527,8 +573,6 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     CBLAssertNotNil(token);
     
     CBL_LOCK(self) {
-        [self mustBeOpen];
-        
         if (((CBLChangeListenerToken*)token).key)
             [self removeDocumentChangeListenerWithToken: token];
         else
@@ -624,9 +668,25 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
 #pragma mark - INTERNAL
 
 - (void) mustBeOpen {
-    if (_c4db == nullptr) {
+    if (_c4db == nullptr || _isClosing) {
         [NSException raise: NSInternalInconsistencyException
                     format: @"%@", kCBLErrorMessageDBClosed];
+    }
+}
+
+- (void) mustBeOpenLocked {
+    CBL_LOCK(self) {
+        [self mustBeOpen];
+    }
+}
+
+- (BOOL) isClosed {
+    return _c4db == nullptr;
+}
+
+- (BOOL) isClosedLocked {
+    CBL_LOCK(self) {
+        return [self isClosed];
     }
 }
 
@@ -831,11 +891,6 @@ static C4DatabaseConfig c4DatabaseConfig (CBLDatabaseConfiguration *config) {
     _docChangeNotifiers = nil;
 }
 
-- (void) freeC4DB {
-    c4db_release(_c4db);
-    _c4db = nil;
-}
-
 #pragma mark - DOCUMENT SAVE AND CONFLICT HANDLING
 
 - (BOOL) saveDocument: (CBLDocument*)document
@@ -957,8 +1012,65 @@ static C4DatabaseConfig c4DatabaseConfig (CBLDatabaseConfiguration *config) {
     return YES;
 }
 
-#pragma mark - RESOLVING REPLICATED CONFLICTS:
+#pragma mark - LIVE-QUERY
 
+- (void) addActiveLiveQuery: (CBLLiveQuery*)liveQuery {
+    CBL_LOCK(self) {
+        [self mustBeOpen];
+        
+        if (!_activeLiveQueries)
+            _activeLiveQueries = [NSMutableSet new];
+        
+        [_activeLiveQueries addObject: liveQuery];
+    }
+}
+
+- (void) removeActiveLiveQuery: (CBLLiveQuery*)liveQuery {
+    CBL_LOCK(self) {
+        [_activeLiveQueries removeObject: liveQuery];
+        
+        if (_activeLiveQueries.count == 0)
+            [_closeCondition broadcast];
+    }
+}
+
+- (uint64_t) activeLiveQueryCount {
+    CBL_LOCK(self) {
+        return _activeLiveQueries.count;
+    }
+}
+
+#pragma mark - REPLICATOR
+
+// NOTE: These methods are called from the replicator thread.
+
+- (void) addActiveReplicator: (CBLReplicator*)replicator {
+    CBL_LOCK(self) {
+        [self mustBeOpen];
+        
+        if (!_activeReplicators)
+            _activeReplicators = [NSMutableSet new];
+        
+        [_activeReplicators addObject: replicator];
+    }
+}
+
+- (void) removeActiveReplicator: (CBLReplicator*)replicator {
+    CBL_LOCK(self) {
+        [_activeReplicators removeObject: replicator];
+        
+        if (_activeReplicators.count == 0)
+            [_closeCondition broadcast];
+    }
+}
+
+- (uint64_t) activeReplicatorCount {
+    CBL_LOCK(self) {
+        return _activeReplicators.count;
+    }
+}
+
+#pragma mark - RESOLVING REPLICATED CONFLICTS:
 
 - (bool) resolveConflictInDocument: (NSString*)docID
               withConflictResolver: (id<CBLConflictResolver>)conflictResolver
