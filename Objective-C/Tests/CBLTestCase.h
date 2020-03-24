@@ -64,9 +64,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CBLTestCase : XCTestCase {
 @protected
     CBLDatabase* _db;
+    CBLDatabase* _otherDB;
 }
 
 @property (readonly, nonatomic) CBLDatabase* db;
+
+@property (readonly, nonatomic, nullable) CBLDatabase* otherDB;
 
 @property (readonly, nonatomic) NSString* directory;
 
@@ -77,8 +80,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** Reopen the default test database (.db property). */
 - (void) reopenDB;
 
-/** Clean the default test database (.db property) */
+/** Clean and reopen the default test database (.db property) */
 - (void) cleanDB;
+
+/** Open the otherDB. The otherDB doesn't open in the test setup, but will be closed in tearDown
+    if the database exists. This method needs to explicitly call to open the otherDB. */
+- (void) openOtherDB;
+
+/** Reopen the otherDB */
+- (void) reopenOtherDB;
 
 /** Delete the database with the given name. */
 - (BOOL) deleteDBNamed: (NSString*)name error: (NSError**)error;
