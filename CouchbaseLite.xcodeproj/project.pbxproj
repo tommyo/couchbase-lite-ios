@@ -277,6 +277,8 @@
 		931C146A1EAAF08C0094F9B2 /* FragmentTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 931C14691EAAF08C0094F9B2 /* FragmentTest.m */; };
 		931C146B1EAAF0960094F9B2 /* FragmentTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 931C14691EAAF08C0094F9B2 /* FragmentTest.m */; };
 		931DE0671F4E3EC2003EF76F /* Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931DE0661F4E3EC2003EF76F /* Index.swift */; };
+		931EF6AB24A2CC5A00AB49FE /* P2PConflictResolutionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931EF69E24A2CC5000AB49FE /* P2PConflictResolutionTest.swift */; };
+		931EF6AC24A2CC5A00AB49FE /* P2PConflictResolutionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931EF69E24A2CC5000AB49FE /* P2PConflictResolutionTest.swift */; };
 		9322DCAB1F0F0E0200C4ACF7 /* Ordering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322DCAA1F0F0E0200C4ACF7 /* Ordering.swift */; };
 		9322DCBE1F0F161A00C4ACF7 /* Joins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9322DCBD1F0F161A00C4ACF7 /* Joins.swift */; };
 		9322DCDF1F14603400C4ACF7 /* CBLQueryLimit.h in Headers */ = {isa = PBXBuildFile; fileRef = 9322DCDD1F14603400C4ACF7 /* CBLQueryLimit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1990,6 +1992,7 @@
 		931C14671EAAD6730094F9B2 /* CBLMutableArrayFragment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLMutableArrayFragment.h; sourceTree = "<group>"; };
 		931C14691EAAF08C0094F9B2 /* FragmentTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FragmentTest.m; sourceTree = "<group>"; };
 		931DE0661F4E3EC2003EF76F /* Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Index.swift; sourceTree = "<group>"; };
+		931EF69E24A2CC5000AB49FE /* P2PConflictResolutionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P2PConflictResolutionTest.swift; sourceTree = "<group>"; };
 		9322DCAA1F0F0E0200C4ACF7 /* Ordering.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ordering.swift; sourceTree = "<group>"; };
 		9322DCBD1F0F161A00C4ACF7 /* Joins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Joins.swift; sourceTree = "<group>"; };
 		9322DCDD1F14603400C4ACF7 /* CBLQueryLimit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLQueryLimit.h; sourceTree = "<group>"; };
@@ -2663,6 +2666,7 @@
 				1A690CC824214EE70084D017 /* ReplicatorTest+PendingDocIds.swift */,
 				93095B23246CF1DE005633B4 /* TLSIdentityTest.swift */,
 				934608EE247F35CC00CF2F27 /* URLEndpointListenerTest.swift */,
+				931EF69E24A2CC5000AB49FE /* P2PConflictResolutionTest.swift */,
 				1AA91DC522B0356000BF0BDE /* CustomLogger.swift */,
 				93249D81246B99FD000A8A6E /* iOS */,
 				939B79241E679017009A70EF /* Info.plist */,
@@ -5426,6 +5430,7 @@
 				93BB1CAA246BB2D4004FFA00 /* FragmentTest.swift in Sources */,
 				93095B2F246CF1F0005633B4 /* TLSIdentityTest.swift in Sources */,
 				934608F0247F35D500CF2F27 /* URLEndpointListenerTest.swift in Sources */,
+				931EF6AB24A2CC5A00AB49FE /* P2PConflictResolutionTest.swift in Sources */,
 				93BB1CB0246BB2DE004FFA00 /* QueryTest.swift in Sources */,
 				93BB1CAB246BB2D4004FFA00 /* LogTest.swift in Sources */,
 				93BB1CA8246BB2D4004FFA00 /* DocumentTest.swift in Sources */,
@@ -5893,6 +5898,7 @@
 				9343F193207D636300F19A89 /* CBLTestHelper.m in Sources */,
 				93095B30246CF1F1005633B4 /* TLSIdentityTest.swift in Sources */,
 				934608F1247F35D500CF2F27 /* URLEndpointListenerTest.swift in Sources */,
+				931EF6AC24A2CC5A00AB49FE /* P2PConflictResolutionTest.swift in Sources */,
 				1AA91DC722B0356000BF0BDE /* CustomLogger.swift in Sources */,
 				69845B0723354D0A00CC16BB /* DateTimeQueryFunctionTest.swift in Sources */,
 				9343F194207D636300F19A89 /* FragmentTest.swift in Sources */,
