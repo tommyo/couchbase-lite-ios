@@ -66,6 +66,8 @@ typedef CBLURLEndpointListener Listener;
     CBLURLEndpointListener* _listener;
 }
 
+#pragma mark - Helper methods
+
 - (Listener*) listen {
     return [self listenWithTLS: YES];
 }
@@ -247,6 +249,160 @@ typedef CBLURLEndpointListener Listener;
     }
 }
 
+- (CBLTLSIdentity*) tlsIdentity: (BOOL)isServer {
+    if (!self.keyChainAccessAllowed) return nil;
+    
+    // Cleanup:
+    [self cleanupTLSIdentity: isServer];
+    
+    // Create server/client identity:
+    NSError* err;
+    NSString* label = isServer ? kServerCertLabel : kClientCertLabel;
+    NSDictionary* attrs = @{ kCBLCertAttrCommonName: isServer ? @"CBL-Server" : @"daniel" };
+    CBLTLSIdentity* identity = [CBLTLSIdentity createIdentityForServer: isServer
+                                                            attributes: attrs
+                                                            expiration: nil
+                                                                 label: label
+                                                                 error: &err];
+    AssertNotNil(identity);
+    AssertNil(err);
+    return identity;
+}
+
+- (void) cleanupTLSIdentity: (BOOL)isServer {
+    if (!self.keyChainAccessAllowed) return;
+    
+    NSError* err;
+    NSString* label = isServer ? kServerCertLabel : kClientCertLabel;
+    Assert([CBLTLSIdentity deleteIdentityWithLabel: label error: &err]);
+}
+
+- (void) validateActiveReplicationsAndURLEndpointListener: (BOOL)isDeleteDBs {
+    if (!self.keyChainAccessAllowed) return;
+    
+    XCTestExpectation* stopExp1 = [self expectationWithDescription: @"replicator#1 stopped"];
+    XCTestExpectation* stopExp2 = [self expectationWithDescription: @"replicator#2 stopped"];
+    XCTestExpectation* idleExp1 = [self expectationWithDescription: @"replicator#1 idle"];
+    XCTestExpectation* idleExp2 = [self expectationWithDescription: @"replicator#2 idle"];
+    
+    NSError* err;
+    CBLMutableDocument* doc =  [self createDocument: @"db-doc"];
+    Assert([self.db saveDocument: doc error: &err], @"Fail to save DB %@", err);
+    doc =  [self createDocument: @"other-db-doc"];
+    Assert([self.otherDB saveDocument: doc error: &err], @"Fail to save otherDB %@", err);
+    
+    // start listener
+    [self listen];
+    
+    // replicator #1
+    id target = [[CBLDatabaseEndpoint alloc] initWithDatabase: self.db];
+    CBLReplicatorConfiguration* config = [[CBLReplicatorConfiguration alloc] initWithDatabase: self.otherDB
+                                                                                       target: target];
+    config.continuous = YES;
+    CBLReplicator* repl1 = [[CBLReplicator alloc] initWithConfig: config];
+
+    // replicator #2
+    [self deleteDBNamed: @"db2" error: &err];
+    CBLDatabase* db2 = [self openDBNamed: @"db2" error: &err];
+    AssertNil(err);
+    config = [[CBLReplicatorConfiguration alloc] initWithDatabase: db2
+                                                           target: _listener.localEndpoint];
+    config.continuous = YES;
+    config.pinnedServerCertificate = (__bridge SecCertificateRef) _listener.tlsIdentity.certs[0];
+    CBLReplicator* repl2 = [[CBLReplicator alloc] initWithConfig: config];
+    
+    id changeListener = ^(CBLReplicatorChange * change) {
+        if (change.status.activity == kCBLReplicatorIdle &&
+            change.status.progress.completed == change.status.progress.total) {
+            if (change.replicator == repl1)
+                [idleExp1 fulfill];
+            else
+                [idleExp2 fulfill];
+            
+        } else if (change.status.activity == kCBLReplicatorStopped) {
+            if (change.replicator == repl1)
+                [stopExp1 fulfill];
+            else
+                [stopExp2 fulfill];
+        }
+    };
+    id token1 = [repl1 addChangeListener: changeListener];
+    id token2 = [repl2 addChangeListener: changeListener];
+    
+    [repl1 start];
+    [repl2 start];
+    [self waitForExpectations: @[idleExp1, idleExp2] timeout: timeout];
+    
+    if (isDeleteDBs) {
+        [db2 delete: &err];
+        AssertNil(err);
+        [self.otherDB delete: &err];
+        AssertNil(err);
+    } else {
+        [db2 close: &err];
+        AssertNil(err);
+        [self.otherDB close: &err];
+        AssertNil(err);
+    }
+    
+    [self waitForExpectations: @[stopExp1, stopExp2] timeout: timeout];
+    [repl1 removeChangeListenerWithToken: token1];
+    [repl2 removeChangeListenerWithToken: token2];
+    [self stopListen];
+}
+
+- (void) validateActiveReplicatorAndURLEndpointListeners: (BOOL)isDeleteDB {
+    if (!self.keyChainAccessAllowed) return;
+    
+    XCTestExpectation* idleExp = [self expectationWithDescription: @"replicator idle"];
+    XCTestExpectation* stopExp = [self expectationWithDescription: @"replicator stopped"];
+
+    // start listener#1 and listener#2
+    NSError* err;
+    Config* config = [[Config alloc] initWithDatabase: self.otherDB];
+    Listener* listener1 = [[Listener alloc] initWithConfig: config];
+    Listener* listener2 = [[Listener alloc] initWithConfig: config];
+    Assert([listener1 startWithError: &err]);
+    AssertNil(err);
+    Assert([listener2 startWithError: &err]);
+    AssertNil(err);
+    
+    CBLMutableDocument* doc =  [self createDocument: @"db-doc"];
+    Assert([self.db saveDocument: doc error: &err], @"Fail to save DB %@", err);
+    doc =  [self createDocument: @"other-db-doc"];
+    Assert([self.otherDB saveDocument: doc error: &err], @"Fail to save otherDB %@", err);
+    
+    // start replicator
+    CBLReplicatorConfiguration* rConfig = [[CBLReplicatorConfiguration alloc] initWithDatabase: self.db
+                                                                                        target: listener1.localEndpoint];
+    rConfig.continuous = YES;
+    rConfig.pinnedServerCertificate = (__bridge SecCertificateRef) listener1.tlsIdentity.certs[0];
+    CBLReplicator* replicator = [[CBLReplicator alloc] initWithConfig: rConfig];
+    id token = [replicator addChangeListener: ^(CBLReplicatorChange * change) {
+        if (change.status.activity == kCBLReplicatorIdle &&
+            change.status.progress.completed == change.status.progress.total) {
+            [idleExp fulfill];
+        } else if (change.status.activity == kCBLReplicatorStopped) {
+            [stopExp fulfill];
+        }
+    }];
+    [replicator start];
+    [self waitForExpectations: @[idleExp] timeout: timeout];
+    
+    // delete / close
+    if (isDeleteDB)
+        [self.otherDB delete: &err];
+    else
+        [self.otherDB close: &err];
+    
+    [self waitForExpectations: @[stopExp] timeout: timeout];
+    
+    // cleanup
+    [replicator removeChangeListenerWithToken: token];
+    [self stopListener: listener1];
+    [self stopListener: listener2];
+}
+
 - (void) releaseCF: (CFTypeRef)ref {
     if (ref != NULL) CFRelease(ref);
 }
@@ -271,6 +427,8 @@ typedef CBLURLEndpointListener Listener;
     [self cleanUpIdentities];
     [super tearDown];
 }
+
+#pragma mark - Tests
 
 - (void) testPort {
     // initialize a listener
@@ -366,16 +524,24 @@ typedef CBLURLEndpointListener Listener;
     
     [self generateDocumentWithID: @"doc-1"];
     
+    XCTestExpectation* x = [self expectationWithDescription: @"Replicator Stopped"];
     id rConfig = [self configWithTarget: _listener.localEndpoint type: kCBLReplicatorTypePush continuous: NO];
+    CBLReplicator* replicator = [[CBLReplicator alloc] initWithConfig: rConfig];
+    
     __block Listener* weakListener = _listener;
     __block uint64_t maxConnectionCount = 0, maxActiveCount = 0;
-    [self run: rConfig reset: NO errorCode: 0 errorDomain: nil onReplicatorReady:^(CBLReplicator * r) {
+    id token = [replicator addChangeListener: ^(CBLReplicatorChange* change) {
         Listener* strongListener = weakListener;
-        [r addChangeListener:^(CBLReplicatorChange * change) {
-            maxConnectionCount = MAX(strongListener.status.connectionCount, maxConnectionCount);
-            maxActiveCount = MAX(strongListener.status.activeConnectionCount, maxActiveCount);
-        }];
+        maxConnectionCount = MAX(strongListener.status.connectionCount, maxConnectionCount);
+        maxActiveCount = MAX(strongListener.status.activeConnectionCount, maxActiveCount);
+        if (change.status.activity == kCBLReplicatorStopped)
+            [x fulfill];
     }];
+    
+    [replicator start];
+    [self waitForExpectations: @[x] timeout: timeout];
+    [replicator removeChangeListenerWithToken: token];
+    
     AssertEqual(maxActiveCount, 1);
     AssertEqual(maxConnectionCount, 1);
     AssertEqual(self.otherDB.count, 1);
@@ -386,55 +552,146 @@ typedef CBLURLEndpointListener Listener;
     AssertEqual(_listener.status.activeConnectionCount, 0);
 }
 
-- (void) testTLSIdentity {
+- (void) testTLSListenerAnonymousIdentity {
     if (!self.keyChainAccessAllowed) return;
     
-    // Disabled TLS:
-    Config* config = [[Config alloc] initWithDatabase: self.otherDB];
-    config.disableTLS = YES;
-    CBLURLEndpointListener* listener = [[Listener alloc] initWithConfig: config];
-    AssertNil(listener.tlsIdentity);
-    
     NSError* error;
-    Assert([listener startWithError: &error]);
-    AssertNil(error);
-    AssertNil(listener.tlsIdentity);
-    [self stopListener: listener];
-    AssertNil(listener.tlsIdentity);
+    CBLMutableDocument* doc = [self createDocument];
+    Assert([self.otherDB saveDocument: doc error: &error], @"Fail to save otherDB %@", error);
     
-    // Anonymous Identity:
-    config = [[Config alloc] initWithDatabase: self.otherDB];
-    listener = [[Listener alloc] initWithConfig: config];
+    Config* config = [[Config alloc] initWithDatabase: self.otherDB];
+    Listener* listener = [[Listener alloc] initWithConfig: config];
     AssertNil(listener.tlsIdentity);
     
     Assert([listener startWithError: &error]);
     AssertNil(error);
     AssertNotNil(listener.tlsIdentity);
-    [self stopListener: listener];
-    AssertNil(listener.tlsIdentity);
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: 0
+            errorDomain: nil];
     
-    // User Identity:
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kServerCertLabel error: &error]);
-    NSDictionary* attrs = @{ kCBLCertAttrCommonName: @"CBL-Server" };
-    CBLTLSIdentity* identity = [CBLTLSIdentity createIdentityForServer: NO
-                                                            attributes: attrs
-                                                            expiration: nil
-                                                                 label: kServerCertLabel
-                                                                 error: &error];
-    config = [[Config alloc] initWithDatabase: self.otherDB];
-    config.tlsIdentity = identity;
-    listener = [[Listener alloc] initWithConfig: config];
-    AssertNil(listener.tlsIdentity);
+    // different pinned cert
+    CBLTLSIdentity* identity = [self tlsIdentity: NO];
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: (__bridge SecCertificateRef)identity.certs[0]
+              errorCode: CBLErrorTLSCertUnknownRoot
+            errorDomain: CBLErrorDomain];
+    [self cleanupTLSIdentity: NO];
     
-    Assert([listener startWithError: &error]);
-    AssertNil(error);
-    AssertNotNil(listener.tlsIdentity);
-    AssertEqual(listener.tlsIdentity, config.tlsIdentity);
+    // No pinned cert
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: nil
+              errorCode: CBLErrorTLSCertUnknownRoot
+            errorDomain: CBLErrorDomain];
+    
     [self stopListener: listener];
     AssertNil(listener.tlsIdentity);
 }
 
-- (void) testPaswordAuth {
+- (void) testTLSListenerUserIdentity {
+    if (!self.keyChainAccessAllowed) return;
+    
+    NSError* error;
+    CBLMutableDocument* doc = [self createDocument];
+    Assert([self.otherDB saveDocument: doc error: &error], @"Fail to save otherDB %@", error);
+    
+    CBLTLSIdentity* tlsIdentity = [self tlsIdentity: YES];
+    Config* config = [[Config alloc] initWithDatabase: self.otherDB];
+    config.tlsIdentity = tlsIdentity;
+    Listener* listener = [[Listener alloc] initWithConfig: config];
+    AssertNil(listener.tlsIdentity);
+    
+    Assert([listener startWithError: &error]);
+    AssertNil(error);
+    AssertNotNil(listener.tlsIdentity);
+    AssertEqual(listener.tlsIdentity, tlsIdentity);
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: 0
+            errorDomain: nil];
+    
+    // different pinned cert
+    CBLTLSIdentity* identity = [self tlsIdentity: NO];
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: (__bridge SecCertificateRef)identity.certs[0]
+              errorCode: CBLErrorTLSCertUnknownRoot
+            errorDomain: CBLErrorDomain];
+    [self cleanupTLSIdentity: NO];
+    
+    // No pinned cert
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: nil
+              errorCode: CBLErrorTLSCertUnknownRoot
+            errorDomain: CBLErrorDomain];
+    
+    [self stopListener: listener];
+    AssertNil(listener.tlsIdentity);
+}
+
+- (void) testNonTLSNullListenerAuthenticator {
+    if (!self.keyChainAccessAllowed) return;
+    
+    NSError* err;
+    CBLMutableDocument* doc1 =  [self createDocument];
+    Assert([self.otherDB saveDocument: doc1 error: &err], @"Fail to save to otherDB %@", err);
+    Listener* listener = [self listenWithTLS: NO];
+    AssertNil(listener.tlsIdentity);
+    
+    // Replicator - No Authenticator:
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: nil
+              errorCode: 0
+            errorDomain: nil];
+    
+    // Replicator - Basic Authenticator
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLBasicAuthenticator alloc] initWithUsername: @"daniel" password: @"456"]
+             serverCert: nil
+              errorCode: 0
+            errorDomain: nil];
+    
+    // Replicator - Certificate Authenticator
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: [self tlsIdentity: NO]]
+             serverCert: nil
+              errorCode: 0
+            errorDomain: nil];
+    
+    // cleanup client cert authenticator identity
+    [self cleanupTLSIdentity: NO];
+    
+    [self stopListener: listener];
+}
+
+- (void) testNonTLSPasswordListenerAuthenticator {
+    if (!self.keyChainAccessAllowed) return;
+    
     // Listener:
     CBLListenerPasswordAuthenticator* auth = [[CBLListenerPasswordAuthenticator alloc] initWithBlock:
         ^BOOL(NSString *username, NSString *password) {
@@ -451,7 +708,16 @@ typedef CBLURLEndpointListener Listener;
               errorCode: CBLErrorHTTPAuthRequired
             errorDomain: CBLErrorDomain];
     
-    // Replicator - Wrong Credentials:
+    // Replicator - Wrong Username:
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLBasicAuthenticator alloc] initWithUsername: @"daneil" password: @"456"]
+             serverCert: nil
+              errorCode: CBLErrorHTTPAuthRequired
+            errorDomain: CBLErrorDomain];
+    
+    // Replicator - Wrong Password:
     [self runWithTarget: listener.localEndpoint
                    type: kCBLReplicatorTypePushAndPull
              continuous: NO
@@ -459,6 +725,18 @@ typedef CBLURLEndpointListener Listener;
              serverCert: nil
               errorCode: CBLErrorHTTPAuthRequired
             errorDomain: CBLErrorDomain];
+    
+    // Replicator - ClientCert Authenticator
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: [self tlsIdentity: NO]]
+             serverCert: nil
+              errorCode: CBLErrorHTTPAuthRequired
+            errorDomain: CBLErrorDomain];
+    
+    // cleanup client cert authenticator identity
+    [self cleanupTLSIdentity: NO];
     
     // Replicator - Success:
     [self runWithTarget: listener.localEndpoint
@@ -470,6 +748,72 @@ typedef CBLURLEndpointListener Listener;
             errorDomain: nil];
     
     [self stopListener: listener];
+}
+
+- (void) testTLSPasswordListenerAuthenticator {
+    if (!self.keyChainAccessAllowed) return;
+    
+    NSError* err;
+    CBLMutableDocument* doc1 =  [self createDocument];
+    Assert([self.otherDB saveDocument: doc1 error: &err], @"Fail to save to otherDB %@", err);
+    
+    // Listener:
+    CBLListenerPasswordAuthenticator* auth = [[CBLListenerPasswordAuthenticator alloc] initWithBlock:
+        ^BOOL(NSString *username, NSString *password) {
+            return ([username isEqualToString: @"daniel"] && [password isEqualToString: @"123"]);
+        }];
+    Listener* listener = [self listenWithTLS: YES auth: auth];
+    
+    // Replicator - No Authenticator:
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: nil
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: CBLErrorHTTPAuthRequired
+            errorDomain: CBLErrorDomain];
+    
+    // Replicator - Wrong Username:
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLBasicAuthenticator alloc] initWithUsername: @"daneil" password: @"456"]
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: CBLErrorHTTPAuthRequired
+            errorDomain: CBLErrorDomain];
+    
+    // Replicator - Wrong Password:
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLBasicAuthenticator alloc] initWithUsername: @"daniel" password: @"456"]
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: CBLErrorHTTPAuthRequired
+            errorDomain: CBLErrorDomain];
+    
+    // Replicator - Different ClientCertAuthenticator
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: [self tlsIdentity: NO]]
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: CBLErrorHTTPAuthRequired
+            errorDomain: CBLErrorDomain];
+    
+    // cleanup client cert authenticator identity
+    [self cleanupTLSIdentity: NO];
+    
+    // Replicator - Success:
+    [self runWithTarget: listener.localEndpoint
+                   type: kCBLReplicatorTypePushAndPull
+             continuous: NO
+          authenticator: [[CBLBasicAuthenticator alloc] initWithUsername: @"daniel" password: @"123"]
+             serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
+              errorCode: 0
+            errorDomain: nil];
+    
+    [self stopListener: listener];
+    
 }
 
 - (void) testClientCertAuthWithCallback API_AVAILABLE(macos(10.12), ios(10.3)) {
@@ -491,31 +835,18 @@ typedef CBLURLEndpointListener Listener;
     AssertNotNil(listener);
     AssertEqual(listener.tlsIdentity.certs.count, 1);
     
-    // Cleanup:
-    NSError* error;
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kClientCertLabel error: &error]);
-    
-    // Create client identity:
-    NSDictionary* attrs = @{ kCBLCertAttrCommonName: @"daniel" };
-    CBLTLSIdentity* identity = [CBLTLSIdentity createIdentityForServer: NO
-                                                            attributes: attrs
-                                                            expiration: nil
-                                                                 label: kClientCertLabel
-                                                                 error: &error];
-    AssertNotNil(identity);
-    AssertNil(error);
-    
     // Replicator:
+    
     [self runWithTarget: listener.localEndpoint
                    type: kCBLReplicatorTypePushAndPull
              continuous: NO
-          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: identity]
+          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: [self tlsIdentity: NO]]
              serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
               errorCode: 0
             errorDomain: nil];
     
-    // Cleanup:
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kClientCertLabel error: &error]);
+    // Cleanup client cert authenticator identity
+    [self cleanupTLSIdentity: NO];
     
     [self stopListener: listener];
 }
@@ -534,31 +865,17 @@ typedef CBLURLEndpointListener Listener;
     AssertNotNil(listener);
     AssertEqual(listener.tlsIdentity.certs.count, 1);
     
-    // Cleanup:
-    NSError* error;
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kClientCertLabel error: &error]);
-    
-    // Create client identity:
-    NSDictionary* attrs = @{ kCBLCertAttrCommonName: @"daniel" };
-    CBLTLSIdentity* identity = [CBLTLSIdentity createIdentityForServer: NO
-                                                            attributes: attrs
-                                                            expiration: nil
-                                                                 label: kClientCertLabel
-                                                                 error: &error];
-    AssertNotNil(identity);
-    AssertNil(error);
-    
     // Replicator:
     [self runWithTarget: listener.localEndpoint
                    type: kCBLReplicatorTypePushAndPull
              continuous: NO
-          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: identity]
+          authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: [self tlsIdentity: NO]]
              serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
               errorCode: CBLErrorTLSClientCertRejected
             errorDomain: CBLErrorDomain];
     
     // Cleanup:
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kClientCertLabel error: &error]);
+    [self cleanupTLSIdentity: NO];
     
     [self stopListener: listener];
 }
@@ -620,34 +937,19 @@ typedef CBLURLEndpointListener Listener;
     Listener* listener = [self listenWithTLS: YES auth: listenerAuth];
     AssertNotNil(listener);
     
-    // Cleanup:
-    __block NSError* error;
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kClientCertLabel error: &error]);
-    
-    
-    // Create wrong client identity:
-    NSDictionary* attrs = @{ kCBLCertAttrCommonName: @"daniel" };
-    CBLTLSIdentity* identity = [CBLTLSIdentity createIdentityForServer: NO
-                                                            attributes: attrs
-                                                            expiration: nil
-                                                                 label: kClientCertLabel
-                                                                 error: &error];
-    AssertNotNil(identity);
-    AssertNil(error);
-    
     // Start Replicator:
     [self ignoreException: ^{
         [self runWithTarget: listener.localEndpoint
                        type: kCBLReplicatorTypePushAndPull
                  continuous: NO
-              authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: identity]
+              authenticator: [[CBLClientCertificateAuthenticator alloc] initWithIdentity: [self tlsIdentity: NO]]
                  serverCert: (__bridge SecCertificateRef) listener.tlsIdentity.certs[0]
                   errorCode: CBLErrorTLSClientCertRejected
                 errorDomain: CBLErrorDomain];
     }];
 
     // Cleanup:
-    Assert([CBLTLSIdentity deleteIdentityWithLabel: kClientCertLabel error: &error]);
+    [self cleanupTLSIdentity: NO];
     
     [self stopListener: listener];
 }
@@ -1252,6 +1554,24 @@ typedef CBLURLEndpointListener Listener;
              serverCert: nil
               errorCode: ECONNREFUSED
             errorDomain: NSPOSIXErrorDomain];
+}
+
+#pragma mark - Close & Delete Replicators and Listeners
+
+- (void) testCloseWithActiveReplicationsAndURLEndpointListener {
+    [self validateActiveReplicationsAndURLEndpointListener: NO];
+}
+
+- (void) testDeleteWithActiveReplicationsAndURLEndpointListener {
+    [self validateActiveReplicationsAndURLEndpointListener: YES];
+}
+
+- (void) testCloseWithActiveReplicatorAndURLEndpointListeners {
+    [self validateActiveReplicatorAndURLEndpointListeners: NO];
+}
+
+- (void) testDeleteWithActiveReplicatorAndURLEndpointListeners {
+    [self validateActiveReplicatorAndURLEndpointListeners: YES];
 }
 
 @end
