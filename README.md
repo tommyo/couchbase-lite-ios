@@ -24,8 +24,8 @@ Couchbase Lite 2.x has a completely new set of APIs. The implementation is on to
 ```
 dependencies: [
         .package(name: "CouchbaseLiteSwift",
-                 url: "https://github.com/couchbase/couchbase-lite-ios.git", 
-                 from: "2.8.0"),
+                 url: "https://github.com/tommyo/couchbase-lite-ios.git", 
+                 from: "2.8.0-json"),
     ],
 ```
 
