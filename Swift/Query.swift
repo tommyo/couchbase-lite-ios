@@ -250,6 +250,9 @@ public class Query {
 
 /// A factory class to create a Select instance.
 public final class QueryBuilder {
+    public static func fromJSON(database: Database, JSONRepresentation json: Data) -> Query {
+        return Query(database: database, JSONRepresentation: json)
+    }
     
     /// Create a SELECT statement instance that you can use further
     /// (e.g. calling the from() function) to construct the complete query statement.
