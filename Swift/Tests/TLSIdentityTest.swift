@@ -19,7 +19,7 @@
 import XCTest
 import CouchbaseLiteSwift
 
-@available(macOS 10.12, iOS 10.0, *)
+@available(macOS 10.12, iOS 10.3, *)
 class TLSIdentityTest: CBLTestCase {
     let serverCertLabel = "CBL-Swift-Server-Cert"
     let clientCertLabel = "CBL-Swift-Client-Cert"
@@ -138,12 +138,16 @@ class TLSIdentityTest: CBLTestCase {
     
     override func setUp() {
         super.setUp()
+        if (!keyChainAccessAllowed) { return }
+        
         try! TLSIdentity.deleteIdentity(withLabel: serverCertLabel)
         try! TLSIdentity.deleteIdentity(withLabel: clientCertLabel)
     }
     
     override func tearDown() {
         super.tearDown()
+        if (!keyChainAccessAllowed) { return }
+        
         try! TLSIdentity.deleteIdentity(withLabel: serverCertLabel)
         try! TLSIdentity.deleteIdentity(withLabel: clientCertLabel)
     }
@@ -319,6 +323,9 @@ class TLSIdentityTest: CBLTestCase {
     
     func testImportIdentity() throws {
         if (!keyChainAccessAllowed) { return }
+        
+        // Delete:
+        try TLSIdentity.deleteIdentity(withLabel: serverCertLabel)
         
         let data = try dataFromResource(name: "identity/certs", ofType: "p12")
         

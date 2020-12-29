@@ -53,6 +53,13 @@ using namespace fleece;
 // How long to wait after a database opens before expiring docs
 #define kHousekeepingDelayAfterOpening 3.0
 
+// this variable defines the state of database
+typedef enum {
+    kCBLDatabaseStateClosed = 0,
+    kCBLDatabaseStateClosing,
+    kCBLDatabaseStateOpened,
+} CBLDatabaseState;
+
 @implementation CBLDatabase {
     NSString* _name;
     CBLDatabaseConfiguration* _config;
@@ -66,8 +73,9 @@ using namespace fleece;
     
     NSMutableSet<id<CBLStoppable>>* _activeStoppables;
     
-    BOOL _isClosing;
     NSCondition* _closeCondition;
+    
+    CBLDatabaseState _state;
 }
 
 @synthesize name=_name;
@@ -119,6 +127,8 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
         
         qName = $sprintf(@"Database-Query <%@>", name);
         _queryQueue = dispatch_queue_create(qName.UTF8String, DISPATCH_QUEUE_SERIAL);
+        
+        _state = kCBLDatabaseStateOpened;
     }
     return self;
 }
@@ -133,6 +143,8 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     if (self) {
         _shellMode = YES;
         _c4db = c4db;
+        
+        _state = kCBLDatabaseStateOpened;
     }
     return self;
 }
@@ -366,8 +378,8 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
         
         CBLLogInfo(Database, @"Closing %@ at path %@", self, self.path);
         
-        if (!_isClosing) {
-            _isClosing = YES;
+        if (_state != kCBLDatabaseStateClosing) {
+            _state = kCBLDatabaseStateClosing;
             
             if (!_closeCondition)
                 _closeCondition = [[NSCondition alloc] init];
@@ -407,9 +419,6 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
         // Release database:
         if (success)
             [self freeC4DB];
-        
-        // Reset closing flag:
-        _isClosing = NO;
         
         return success;
     }
@@ -493,6 +502,9 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     slice fromPath(path.fileSystemRepresentation);
     CBLStringBytes destinationName(name);
     C4DatabaseConfig2 c4Config = c4DatabaseConfig2(config ?: [CBLDatabaseConfiguration new]);
+    CBLStringBytes d(config.directory);
+    c4Config.parentDirectory = d;
+    
     if (!(c4db_copyNamed(fromPath, destinationName, &c4Config, &err) || err.code==0 || convertError(err, outError))) {
         NSString* toPathStr = databasePath(name, dir);
         NSError* removeError;
@@ -668,6 +680,10 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
                     format: @"%@", kCBLErrorMessageDBClosed];
 }
 
+- (BOOL) mustBeOpen: (NSError**)outError {
+    return ![self isClosed] || convertError({LiteCoreDomain, kC4ErrorNotOpen}, outError);
+}
+
 - (void) mustBeOpenLocked {
     CBL_LOCK(self) {
         [self mustBeOpen];
@@ -676,14 +692,20 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
 
 // Must be called inside self lock
 - (void) mustBeOpenAndNotClosing {
-    if ([self isClosed] || _isClosing)
+    if (_state < kCBLDatabaseStateOpened)
         [NSException raise: NSInternalInconsistencyException
                     format: @"%@", kCBLErrorMessageDBClosed];
 }
 
 // Must be called inside self lock
 - (BOOL) isClosed {
-    return _c4db == nullptr;
+    if (_state == kCBLDatabaseStateClosed) {
+        assert(_c4db == nullptr);
+        return YES;
+    } else {
+        assert(_c4db != nullptr);
+        return NO;
+    }
 }
 
 - (BOOL) isClosedLocked {
@@ -772,6 +794,9 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     CBLLogInfo(Database, @"Opening %@ at path %@", self, path);
     
     C4DatabaseConfig2 c4config = c4DatabaseConfig2(_config);
+    CBLStringBytes d(_config.directory);
+    c4config.parentDirectory = d;
+    
     C4Error err;
     CBLStringBytes n(_name);
     _c4db = c4db_openNamed(n, &c4config, &err);
@@ -781,6 +806,8 @@ static void dbObserverCallback(C4DatabaseObserver* obs, void* context) {
     _sharedKeys = c4db_getFLSharedKeys(_c4db);
     
     [self scheduleDocumentExpiration: kHousekeepingDelayAfterOpening];
+    
+    _state = kCBLDatabaseStateOpened;
     
     return YES;
 }
@@ -816,13 +843,7 @@ static C4DatabaseConfig2 c4DatabaseConfig2 (CBLDatabaseConfiguration *config) {
     if (config.encryptionKey)
         c4config.encryptionKey = [CBLDatabase c4EncryptionKey: config.encryptionKey];
 #endif
-    CBLStringBytes dir(config.directory);
-    c4config.parentDirectory = dir;
     return c4config;
-}
-
-- (BOOL) mustBeOpen: (NSError**)outError {
-    return _c4db != nullptr || convertError({LiteCoreDomain, kC4ErrorNotOpen}, outError);
 }
 
 - (nullable CBLDocument*) documentWithID: (NSString*)documentID
@@ -948,6 +969,8 @@ static C4DatabaseConfig2 c4DatabaseConfig2 (CBLDatabaseConfiguration *config) {
 - (void) freeC4DB {
     c4db_release(_c4db);
     _c4db = nil;
+    
+    _state = kCBLDatabaseStateClosed;
 }
 
 #pragma mark - DOCUMENT SAVE AND CONFLICT HANDLING
